@@ -2,14 +2,14 @@
 
 [[package]]
 name = "bevy"
-version = "2.0.0b2"
+version = "2.0.0b4"
 description = "Python Dependency Inversion made simple so you can focus on creating amazing code."
 category = "main"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "bevy-2.0.0b2-py3-none-any.whl", hash = "sha256:40739c7aca2ca08342f3921b968bfecc75f9b86e445eb6a1b2fb79fcbf02d562"},
-    {file = "bevy-2.0.0b2.tar.gz", hash = "sha256:e3c4d599ead6270ef8b84c9fb96cb4d80595ceea03a25ecfe4434536f7731417"},
+    {file = "bevy-2.0.0b4-py3-none-any.whl", hash = "sha256:e4adee7063d13a72e869f227aa26f48fd1dcc7bba4a0e6fd6aff93624a4614aa"},
+    {file = "bevy-2.0.0b4.tar.gz", hash = "sha256:932a03e5ebe5d3fb9efdf20cf727da2ddff813ec5fccd4ec3ff7690f5f8635ef"},
 ]
 
 [[package]]
