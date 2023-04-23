@@ -1,6 +1,6 @@
-from typing import Any, Generic, Type, TypeVar
-from schism.union_types.class_properties import ClassProperty
-from schism.union_types.singleton import SingletonClass
+from typing import Generic, Type, TypeVar
+from schism.utils.class_properties import ClassProperty
+from schism.utils.singleton_classes import SingletonClass
 
 
 _T = TypeVar("_T")

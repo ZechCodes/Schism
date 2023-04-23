@@ -1,4 +1,4 @@
-from schism.union_types.option import Option, NullOptionException
+from schism.utils.options import Option, NullOptionException
 from pytest import raises
 
 
