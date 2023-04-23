@@ -1,5 +1,11 @@
 from schism.service_manager import ServiceManager
 from schism.services import Service
+from typing import Annotated
+
+
+class ClientBridge:
+    def __init__(self):
+        self.created = True
 
 
 class HostBridge:
@@ -10,17 +16,20 @@ class HostBridge:
         self.launched = True
 
 
+class TestService:
+    def __init__(self):
+        self.launched = False
+
+    async def launch(self):
+        self.launched = True
+
+
 def test_service_manager_entry_point():
-    entered = False
-
-    async def entry():
-        nonlocal entered
-        entered = True
-
     services = {
         "test-service": Service(
             "test-service",
-            entry,
+            TestService,
+            TestService.launch,
             None,
             {},
             HostBridge,
@@ -30,17 +39,15 @@ def test_service_manager_entry_point():
 
     manager = ServiceManager("test-service", services)
     manager.launch()
-    assert entered
+    assert manager.repo.get(Annotated[TestService, f"service[{manager.active_service.name}]"]).launched
 
 
 def test_service_manager_host_bridge():
-    async def entry():
-        ...
-
     services = {
         "test-service": Service(
             "test-service",
-            entry,
+            TestService,
+            TestService.launch,
             None,
             {},
             HostBridge,
@@ -51,3 +58,38 @@ def test_service_manager_host_bridge():
     manager = ServiceManager("test-service", services)
     manager.launch()
     assert manager.repo.get(manager.active_service.bridge_host).launched
+
+
+def test_service_manager_client_bridge():
+    class Dep:
+        def __init__(self):
+            self.created = True
+            self.launched = False
+
+        def launch(self):
+            self.launched = True
+
+    services = {
+        "test-service": Service(
+            "test-service",
+            TestService,
+            TestService.launch,
+            None,
+            {},
+            HostBridge,
+            {},
+        ),
+        "dep-service": Service(
+            "dep-service",
+            Dep,
+            Dep.launch,
+            ClientBridge,
+            {},
+            None,
+            {},
+        )
+    }
+
+    manager = ServiceManager("test-service", services)
+    manager.launch()
+    assert isinstance(manager.repo.get(Dep), ClientBridge)

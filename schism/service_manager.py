@@ -4,6 +4,7 @@ from schism.service_providers import ServiceProvider
 from schism.utils.options import Value
 from inspect import isawaitable
 from asyncio import get_event_loop, AbstractEventLoop
+from functools import partial
 
 
 class ServiceManager:
@@ -25,9 +26,10 @@ class ServiceManager:
                 if isawaitable(host_task):
                     loop.create_task(host_task)
 
-        loop.run_until_complete(self.active_service.entry_point())
+        service = self.repo.get(self.active_service.type)
+        loop.run_until_complete(self.active_service.entry_point(service))
 
     def setup_repository(self, loop: AbstractEventLoop):
-        self.repo.add_providers(ServiceProvider)
+        self.repo.add_providers(partial(ServiceProvider, service_manager=self))
         self.repo.set(AbstractEventLoop, loop)
         self.repo.set(ServiceManager, self)
