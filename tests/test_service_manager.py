@@ -31,3 +31,23 @@ def test_service_manager_entry_point():
     manager = ServiceManager("test-service", services)
     manager.launch()
     assert entered
+
+
+def test_service_manager_host_bridge():
+    async def entry():
+        ...
+
+    services = {
+        "test-service": Service(
+            "test-service",
+            entry,
+            None,
+            {},
+            HostBridge,
+            {},
+        )
+    }
+
+    manager = ServiceManager("test-service", services)
+    manager.launch()
+    assert manager.repo.get(manager.active_service.bridge_host).launched
