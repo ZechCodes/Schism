@@ -1,4 +1,6 @@
 from typing import Any, Generic, Type, TypeVar
+from schism.union_types.class_properties import ClassProperty
+from schism.union_types.singleton import SingletonClass
 
 
 _T = TypeVar("_T")
@@ -29,22 +31,17 @@ class Value(Option[_T]):
         return f"{type(self).__name__}({self.value!r})"
 
 
-class Null(Value[_T]):
-    def __init__(self):
-        super().__init__(None)
-
-    def __instancecheck__(self, instance):
-        return instance is self
-
-    @property
-    def value(self) -> _T:
+class Null(SingletonClass, Value[_T]):
+    @ClassProperty
+    def value(cls) -> _T:
         raise NullOptionException("Null value")
 
     @value.setter
     def value(self, _):
         return
 
-    def get(self, default: _T) -> _T:
+    @classmethod
+    def get(cls, default: _T) -> _T:
         return default
 
     def __bool__(self):
@@ -58,4 +55,4 @@ class Null(Value[_T]):
 
 
 Option.Value = Value
-Option.Null = Null()
+Option.Null = Null

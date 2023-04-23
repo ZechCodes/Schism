@@ -23,5 +23,5 @@ def test_null_default():
     assert Option[str].Null.get("test") == "test"
 
 
-def test_null_instance():
-    assert isinstance(Option[None].Null(), Option[None].Null)
+def test_null_singleton():
+    assert Option[None].Null() is Option[None].Null
