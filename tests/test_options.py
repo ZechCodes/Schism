@@ -1,4 +1,4 @@
-from schism.enum_types.option import Option, NullOptionException
+from schism.union_types.option import Option, NullOptionException
 from pytest import raises
 
 
@@ -21,3 +21,7 @@ def test_null():
 
 def test_null_default():
     assert Option[str].Null.get("test") == "test"
+
+
+def test_null_instance():
+    assert isinstance(Option[None].Null(), Option[None].Null)

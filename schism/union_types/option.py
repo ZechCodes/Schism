@@ -1,7 +1,5 @@
 from typing import Any, Generic, Type, TypeVar
 
-from schism.enum_types.enum import Enum
-
 
 _T = TypeVar("_T")
 
@@ -10,7 +8,12 @@ class NullOptionException(Exception):
     ...
 
 
-class Value(Generic[_T]):
+class Option(Generic[_T]):
+    Value: "Type[Value[_T]]"
+    Null: "Type[Null[_T]]"
+
+
+class Value(Option[_T]):
     __match_args__ = ("value",)
 
     def __init__(self, value: _T):
@@ -30,6 +33,9 @@ class Null(Value[_T]):
     def __init__(self):
         super().__init__(None)
 
+    def __instancecheck__(self, instance):
+        return instance is self
+
     @property
     def value(self) -> _T:
         raise NullOptionException("Null value")
@@ -44,10 +50,12 @@ class Null(Value[_T]):
     def __bool__(self):
         return False
 
+    def __call__(self, *_):
+        return self
+
     def __repr__(self):
         return f"{type(self).__name__}()"
 
 
-class Option(Generic[_T], Enum):
-    Value: Type[Value[_T]] = Value
-    Null = Null()
+Option.Value = Value
+Option.Null = Null()
