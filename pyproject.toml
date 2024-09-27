@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "schism"
+version = "0.0.1"
+description = "Schism is an autowiring library that makes modularity simple in monolithes and simplifies code sharing in microservices."
+authors = ["ZechCodes <hi@zech.codes>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+pytest-asyncio = "^0.24.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
