@@ -46,13 +46,13 @@ files = [
 
 [[package]]
 name = "nubby"
-version = "0.0.1"
+version = "0.0.2"
 description = "Config loader that injects configs using Bevy."
 optional = false
 python-versions = "<4.0,>=3.12"
 files = [
-    {file = "nubby-0.0.1-py3-none-any.whl", hash = "sha256:62a3b0d2e0f91db7e967aed695d3d38d56280c4dbb8bc6fb8813fc0415d6b1b6"},
-    {file = "nubby-0.0.1.tar.gz", hash = "sha256:b5f53967d822b2207bee96910e64dd261eae4240850a05035c94507dd6573c2d"},
+    {file = "nubby-0.0.2-py3-none-any.whl", hash = "sha256:c5ab0ae8d888fcedd8c6009224ca8e510854d65197426c90e66e6c4635a22950"},
+    {file = "nubby-0.0.2.tar.gz", hash = "sha256:26ea1537294a88894d003caf994026c1e89be487d11530c6fb1d252692dd0416"},
 ]
 
 [package.dependencies]
@@ -339,4 +339,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "f27e8d9ae09badc85bd69937fdc0367a1ca49f32fa577eacba3aa901f4c5f083"
+content-hash = "e50caf6715fd5be0a04d84760b2dc5d41de784cba9b0c09937763fb27a380f53"
