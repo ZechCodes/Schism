@@ -1,6 +1,6 @@
 import threading
 
-from schism.wiring_strategies import WiringStrategy, DirectWiringStrategy
+from schism.wiring_strategies import BaseWiringStrategy, DirectWiringStrategy
 
 
 _global_controller = None
@@ -13,12 +13,12 @@ class SchismController:
         self._wiring_strategy_write_lock = threading.Lock()
 
     @property
-    def wiring_strategy(self) -> WiringStrategy:
+    def wiring_strategy(self) -> BaseWiringStrategy:
         with self._wiring_strategy_write_lock:
             return self._wiring_strategy
 
     @wiring_strategy.setter
-    def wiring_strategy(self, value: WiringStrategy):
+    def wiring_strategy(self, value: BaseWiringStrategy):
         with self._wiring_strategy_write_lock:
             self._wiring_strategy = value
 
