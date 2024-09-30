@@ -26,8 +26,9 @@ class ServiceConfig(SchismConfigModel, filename="schism.config"):
     def get_service_type(self) -> "Type[services.Service]":
         return self._load_object(self.service)
 
+    @staticmethod
     @lru_cache
-    def _load_object(self, import_path: str):
+    def _load_object(import_path: str):
         module, cls = import_path.rsplit(".", 1)
         return getattr(import_module(module), cls)
 
