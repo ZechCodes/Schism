@@ -2,16 +2,16 @@ from typing import TypeVar, Type
 
 from bevy import inject, dependency
 
-from schism.configs import ServicesConfig, ServiceConfig
-from schism.services import Service
 from schism.wiring_strategies import BaseWiringStrategy
+import schism.configs as configs
+import schism.services as services
 
 
 T = TypeVar("T")
 
 
 class ServiceData:
-    def __init__(self, service: Service, config: ServiceConfig):
+    def __init__(self, service: "services.Service", config: "configs.ServiceConfig"):
         self.service = service
         self.config = config
         self._client = None
@@ -34,7 +34,7 @@ class ServiceData:
 
 class BridgeWiringStrategy(BaseWiringStrategy):
     def __init__(self):
-        self._service_cache: dict[Type[Service], ServiceData] = {}
+        self._service_cache: dict[Type[services.Service], ServiceData] = {}
 
     def get_facade(self, target: Type[T]) -> T:
         if target not in self._service_cache:
@@ -42,13 +42,15 @@ class BridgeWiringStrategy(BaseWiringStrategy):
 
         return self._service_cache[target].client
 
-    def _initialize_service(self, target: Type[Service]):
+    def _initialize_service(self, target: "Type[services.Service]"):
         service_config = self._find_service_config(target)
         service = service_config.get_service_type()()
         self._service_cache[target] = ServiceData(service, service_config)
 
     @inject
-    def _find_service_config(self, target: Type[T], config: ServicesConfig = dependency()) -> ServiceConfig:
+    def _find_service_config(
+        self, target: Type[T], config: "configs.ServicesConfig" = dependency()
+    ) -> "configs.ServiceConfig":
         for service in config.services:
             if issubclass(target, service.get_service_type()):
                 return service
