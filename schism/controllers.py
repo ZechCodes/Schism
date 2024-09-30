@@ -33,6 +33,11 @@ def get_controller() -> SchismController:
         return _global_controller
 
 
+def has_controller() -> bool:
+    with _global_controller_write_lock:
+        return _global_controller is not None
+
+
 def set_controller(controller: SchismController):
     global _global_controller
 
