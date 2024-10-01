@@ -1,12 +1,12 @@
+import os
 from typing import Type
 
 from bevy import Repository
 from pytest_asyncio import fixture
 
-import schism.controllers
-import schism.entry_points
 from schism.configs import ServicesConfig
 from schism.services import Service
+import schism.controllers as controllers
 
 
 class ServiceA(Service):
@@ -27,34 +27,30 @@ class Bridge:
 
     @classmethod
     def create_server(cls, service: Type[Service]):
-        schism.entry_points.create_entry_point("test_service", Bridge("server"))
+        controllers.get_controller().create_entry_point("test_service", Bridge("server"))
 
 
-@fixture(scope="session", autouse=True)
+@fixture(autouse=True)
 def setup_runtime():
-    schism.entry_points.clear_all_entry_points()
-
     repo = Repository.factory()
     repo.set(
         ServicesConfig,
         ServicesConfig(
-            **{
-                "services": [
-                    {
-                        "name": "service-a",
-                        "service": "conftest.ServiceA",
-                        "bridge": "conftest.Bridge",
-                    },
-                    {
-                        "name": "service-b",
-                        "service": "conftest.ServiceB",
-                        "bridge": "conftest.Bridge",
-                    },
-                ],
-            }
+            services = [
+                {
+                    "name": "service-a",
+                    "service": "conftest.ServiceA",
+                    "bridge": "conftest.Bridge",
+                },
+                {
+                    "name": "service-b",
+                    "service": "conftest.ServiceB",
+                    "bridge": "conftest.Bridge",
+                },
+            ],
         )
     )
     Repository.set_repository(repo)
 
-    controller = schism.controllers.get_controller()
-    controller.ACTIVE_SERVICES = {"service-a"}
+    controllers._global_controller = None
+    controllers.SchismController.ACTIVE_SERVICES = {"service-a"}

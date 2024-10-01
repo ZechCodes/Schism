@@ -1,10 +1,14 @@
 from bevy import inject, dependency
 
-from schism.entry_points import create_entry_point
 import schism.controllers
-import schism.entry_points
 
 from conftest import ServiceA, Bridge
+from pytest_asyncio import fixture
+from schism.controllers import get_controller, set_controller, EntryPointController
+
+@fixture(autouse=True)
+def setup_entry_point_runtime(setup_runtime):
+    set_controller(EntryPointController())
 
 
 def test_client_injection():
@@ -19,5 +23,5 @@ def test_client_injection():
 
 def test_server_creation():
     Bridge.create_server(ServiceA)
-    assert isinstance(schism.entry_points.test_service, Bridge)
-    assert schism.entry_points.test_service.acting_as == "server"
+    assert isinstance(get_controller().entry_points["test_service"], Bridge)
+    assert get_controller().entry_points["test_service"].acting_as == "server"
