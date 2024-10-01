@@ -1,3 +1,9 @@
+from abc import ABC, abstractmethod
+from typing import Type
+
+from schism.services import Service
+
+
 class BridgeClient:
     ...
 
@@ -6,11 +12,13 @@ class BridgeServer:
     ...
 
 
-class BaseBridge:
+class BaseBridge(ABC):
     @classmethod
-    def create_client(cls) -> BridgeClient:
-        raise NotImplementedError
+    @abstractmethod
+    def create_client(cls, service_type: Type[Service]) -> BridgeClient:
+        ...
 
     @classmethod
-    def create_server(cls) -> BridgeServer:
-        raise NotImplementedError
+    @abstractmethod
+    def create_server(cls, service_type: Type[Service]) -> BridgeServer:
+        ...
