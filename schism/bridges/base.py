@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Type
+from typing import Type, TYPE_CHECKING
 
-from schism.services import Service
+if TYPE_CHECKING:
+    from schism.services import Service
 
 
 class BridgeClient:
@@ -15,10 +16,10 @@ class BridgeServer:
 class BaseBridge(ABC):
     @classmethod
     @abstractmethod
-    def create_client(cls, service_type: Type[Service]) -> BridgeClient:
+    def create_client(cls, service_type: "Type[Service]") -> BridgeClient:
         ...
 
     @classmethod
     @abstractmethod
-    def create_server(cls, service_type: Type[Service]) -> BridgeServer:
+    def create_server(cls, service_type: "Type[Service]") -> BridgeServer:
         ...
