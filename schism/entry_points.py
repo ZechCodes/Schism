@@ -1,7 +1,6 @@
 from typing import Any
 
-from schism.controllers import has_controller
-
+from schism.controllers import has_controller, EntryPointController, set_controller
 
 __runtime_entry_points = {}
 
@@ -38,5 +37,6 @@ def clear_all_entry_points():
 
 ## Bootstrap if the application is being launched through an entry point
 if not has_controller():
-    import schism.bootstrap
-    schism.bootstrap.launch()
+    controller = EntryPointController()
+    set_controller(controller)
+    controller.launch()
