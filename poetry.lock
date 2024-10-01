@@ -298,13 +298,13 @@ files = [
 
 [[package]]
 name = "tramp"
-version = "0.1.10"
+version = "0.1.11"
 description = "A collection of utlities that can be used in other projects."
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "tramp-0.1.10-py3-none-any.whl", hash = "sha256:69782f3c63d41c1c572dd2318c969c5393e589d480e270fd1d8ca0a1f26862cb"},
-    {file = "tramp-0.1.10.tar.gz", hash = "sha256:06b3c332890067e65666c63c627c5ec30f7b7493dc6bffdfaaf0315cde2af3a7"},
+    {file = "tramp-0.1.11-py3-none-any.whl", hash = "sha256:dd19f5bd05fc9f74d81bd48c1071418607b857393c722eb0570d66675f432663"},
+    {file = "tramp-0.1.11.tar.gz", hash = "sha256:4f2309f11c3b2d6394c435ee9f9d4487ab0fd76cd8230f18fedf85a00d79aeff"},
 ]
 
 [[package]]
@@ -321,4 +321,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "a75a5081b54368c0fa1726436250bf627f18357952684d14d33cc35e627fad58"
+content-hash = "6d3912835a5c8db61f6e3025fc05aa26e0f025fa81c77a445f24ba49bd1852fc"

@@ -12,6 +12,7 @@ python = "^3.12"
 bevy = "^2.0.2"
 nubby = {extras = ["yaml"], version = "^0.0.2"}
 pydantic = "^2.9.2"
+tramp = "^0.1.11"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
