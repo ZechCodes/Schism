@@ -75,12 +75,7 @@ class SchismController:
                 raise ValueError(f"No service matching {service} is configured.")
 
     def is_service_active(self, service: Type[services.Service]) -> bool:
-        match self.find_service_matching(service):
-            case Optional.Some(service_config):
-                return service_config.service in self.ACTIVE_SERVICES
-
-            case Optional.Nothing():
-                raise ValueError(f"No service matching {service} is configured.")
+        return self.get_service_config(service).service in self.ACTIVE_SERVICES
 
     @inject
     def _load_services_configs(
