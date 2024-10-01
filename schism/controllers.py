@@ -43,7 +43,7 @@ class SchismController(ABC):
         """Returns a mapping of services that are not running in the current process."""
 
     @abstractmethod
-    def launch(self):
+    def bootstrap(self):
         """Bootstraps the running process to make services available."""
 
     @property
@@ -119,7 +119,7 @@ class MonolithicController(SchismController):
     def remote_services(self) -> ServicesConfigMapping:
         return {}
 
-    def launch(self):
+    def bootstrap(self):
         """Monolithic processes don't have services that need to be bootstrapped."""
         return
 
@@ -160,7 +160,7 @@ class EntryPointController(SchismController):
                 )
                 return self.remote_services
 
-    def launch(self):
+    def bootstrap(self):
         """Entry point processes need to bootstrap services that are active."""
         for service_config in self.active_services.values():
             self._launch_server(service_config)
