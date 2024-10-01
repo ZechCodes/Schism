@@ -18,6 +18,6 @@ def test_client_injection():
 
 
 def test_server_creation():
-    Bridge.create_server()
+    Bridge.create_server(ServiceA)
     assert isinstance(schism.entry_points.test_service, Bridge)
     assert schism.entry_points.test_service.acting_as == "server"
