@@ -15,7 +15,7 @@ class SchismConfigModel(BaseModel, ConfigModel, lax=True):
         return self.model_dump()
 
 
-class ServiceConfig(SchismConfigModel, filename="schism.config"):
+class ServiceConfig(SchismConfigModel, lax=True):
     name: str
     service: str
     bridge: str
@@ -33,5 +33,5 @@ class ServiceConfig(SchismConfigModel, filename="schism.config"):
         return getattr(import_module(module), cls)
 
 
-class ServicesConfig(SchismConfigModel, lax=True):
+class ServicesConfig(SchismConfigModel, filename="schism.config"):
     services: list[ServiceConfig]
