@@ -1,5 +1,7 @@
 from typing import Any
 
+from schism.controllers import has_controller
+
 
 __runtime_entry_points = {}
 
@@ -32,3 +34,9 @@ def clear_all_entry_points():
         del globals()[name]
 
     __runtime_entry_points.clear()
+
+
+## Bootstrap if the application is being launched through an entry point
+if not has_controller():
+    import schism.bootstrap
+    schism.bootstrap.launch()
