@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Type, TYPE_CHECKING
 from typing import Type, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -7,11 +6,15 @@ if TYPE_CHECKING:
 
 
 class BridgeClient:
-    ...
+    def __init__(self, service: "Type[Service]", config: Any):
+        self.service = service
+        self.config = config
 
 
-class BridgeServer:
-    ...
+class BridgeServer(ABC):
+    def __init__(self, service: "Type[Service]", config: Any):
+        self.service = service
+        self.config = config
 
     @abstractmethod
     async def launch(self):
