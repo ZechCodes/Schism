@@ -1,4 +1,4 @@
-from schism.controllers import has_controller, EntryPointController, set_controller
+from schism.controllers import EntryPointController, set_controller
 
 
 controller = EntryPointController()
