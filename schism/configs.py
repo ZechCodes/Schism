@@ -1,6 +1,6 @@
 from functools import lru_cache
 from importlib import import_module
-from typing import Type, TYPE_CHECKING
+from typing import Type, TYPE_CHECKING, Any
 
 from nubby import ConfigModel
 from pydantic import BaseModel
@@ -18,13 +18,16 @@ class SchismConfigModel(BaseModel, ConfigModel, lax=True):
 class ServiceConfig(SchismConfigModel, lax=True):
     name: str
     service: str
-    bridge: str
+    bridge: str | dict[str, Any]
 
     def get_bridge_type(self) -> "Type[bridges.BaseBridge]":
         return self._load_object(self.bridge)
 
     def get_service_type(self) -> "Type[services.Service]":
         return self._load_object(self.service)
+
+    def get_bridge_config(self) -> Any:
+        return self.get_bridge_type().config_factory(self.bridge)
 
     @staticmethod
     @lru_cache
