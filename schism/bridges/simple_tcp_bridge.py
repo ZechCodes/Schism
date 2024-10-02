@@ -91,15 +91,15 @@ class SimpleTCPClient(BridgeClient):
 
         response = pickle.loads(data)
         if response["status"] == "error":
-            error = response["data"]["error"]
             remote_error = (
-                f"\n\n"
-                f"-------------------------------------------------------------------------\n"
-                f"The above exception was caused by the below exception on a remote service\n"
-                f"-------------------------------------------------------------------------\n\n"
-                f"{''.join(response['data']['traceback'])}"
+                f"\n"
+                f"{''.join(response['data']['traceback'])}\n"
+                f"---------------------------------------------\n"
+                f"The above stacktrace is from a remote service\n"
+                f"---------------------------------------------"
             )
-            raise RemoteError(remote_error)
+            error = response["data"]["error"]
+            raise error from RemoteError(remote_error)
 
         return response["data"]
 
