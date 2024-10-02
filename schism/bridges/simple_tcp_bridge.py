@@ -2,7 +2,7 @@ import asyncio
 import hashlib
 import os
 import pickle
-from importlib import import_module
+import traceback
 from typing import Type, TYPE_CHECKING
 
 from bevy import get_repository
@@ -25,6 +25,10 @@ class RequestPayload(BaseModel):
     kwargs: dict
 
 
+class RemoteError(Exception):
+    pass
+
+
 class ResponseBuilder:
     def __init__(self):
         self.status = "success"
@@ -38,8 +42,12 @@ class ResponseBuilder:
             self.status = "error"
             self.data = {
                 "error": exc_val,
-                "traceback": exc_tb,
+                "traceback": traceback.format_exception(exc_type, exc_val, exc_tb),
+                "context": exc_val.__context__,
+                "cause": exc_val.__cause__,
             }
+
+        return True
 
     def set(self, data):
         self.data = data
@@ -51,13 +59,49 @@ class ResponseBuilder:
         }
 
 
-class SimpleTCPConfig(SchismConfigModel):
+class SimpleTCPConfig(SchismConfigModel, lax=True):
     host: str
     port: int
 
 
 class SimpleTCPClient(BridgeClient):
     config: SimpleTCPConfig
+
+    def __getattr__(self, item):
+        return lambda *a, **k: self.__make_request(item, a, k)
+
+    async def __make_request(self, method, args, kwargs):
+        request = RequestPayload(method=method, args=args, kwargs=kwargs)
+        data = pickle.dumps(request)
+        signature = _generate_signature(data)
+        payload = signature + data
+        length = len(payload)
+        reader, writer = await asyncio.open_connection(self.config.host, self.config.port)
+        writer.write(length.to_bytes(4) + payload)
+        await writer.drain()
+
+        length_bytes = await reader.read(4)
+        length = int.from_bytes(length_bytes)
+        payload = await reader.read(length)
+        signature, data = payload[:64], payload[64:]
+        if signature != _generate_signature(data):
+            raise ValueError(
+                f"Received an invalid signature from the service {self.service.__module__}.{self.service.__name__}"
+            )
+
+        response = pickle.loads(data)
+        if response["status"] == "error":
+            error = response["data"]["error"]
+            remote_error = (
+                f"\n\n"
+                f"-------------------------------------------------------------------------\n"
+                f"The above exception was caused by the below exception on a remote service\n"
+                f"-------------------------------------------------------------------------\n\n"
+                f"{''.join(response['data']['traceback'])}"
+            )
+            raise RemoteError(remote_error)
+
+        return response["data"]
 
 
 class SimpleTCPServer(BridgeServer):
@@ -85,6 +129,7 @@ class SimpleTCPServer(BridgeServer):
                 method = getattr(service, request.method)
                 result.set(await method(*request.args, **request.kwargs))
 
+        print(f"Sending response: {result.to_dict()}")
         response = pickle.dumps(result.to_dict())
         signature = _generate_signature(response)
         length = len(response) + len(signature)
@@ -99,7 +144,7 @@ class SimpleTCPBridge(BaseBridge):
 
     @classmethod
     def create_client(cls, service_type: "Type[Service]", config: SimpleTCPConfig):
-        return BridgeClient(service_type, config)
+        return SimpleTCPClient(service_type, config)
 
     @classmethod
     def create_server(cls, service_type: "Type[Service]", config: SimpleTCPConfig):
