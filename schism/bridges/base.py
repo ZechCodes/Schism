@@ -13,6 +13,10 @@ class BridgeClient:
 class BridgeServer:
     ...
 
+    @abstractmethod
+    async def launch(self):
+        ...
+
 
 class BaseBridge(ABC):
     @classmethod
