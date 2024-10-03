@@ -156,9 +156,8 @@ class SimpleTCPBridge(BaseBridge):
     @classmethod
     def config_factory(cls, bridge_config: str | dict[str, str | int]) -> SimpleTCPConfig:
         match bridge_config:
-            case str() as host_port:
-                host, port = host_port.split(":")
-                return SimpleTCPConfig(host=host, port=int(port))
+            case str():
+                return SimpleTCPConfig(host="localhost", port=12321)
 
             case {"host": str() as host, "port": int() as port}:
                 return SimpleTCPConfig(host=host, port=port)
