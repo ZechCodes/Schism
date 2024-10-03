@@ -163,4 +163,4 @@ class SimpleTCPBridge(BaseBridge):
                 return SimpleTCPConfig(host=host, port=port)
 
             case _:
-                raise ValueError(f"Invalid bridge configuration: {bridge_config!r}")
+                raise ValueError(f"Invalid bridge configuration for {cls.__name__}: {bridge_config}")
