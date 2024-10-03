@@ -1,6 +1,7 @@
 from bevy import Repository
 from pytest_asyncio import fixture
 
+from schism import activate
 from schism.configs import ServicesConfig
 from schism.services import Service
 import schism.controllers as controllers
@@ -53,6 +54,4 @@ def simple_entry_point_runtime():
     )
     Repository.set_repository(repo)
 
-    controller = controllers.EntryPointController()
-    controller._env_active_services = {"conftest.ServiceA"}
-    controllers.set_controller(controller)
+    activate()
