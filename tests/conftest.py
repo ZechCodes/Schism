@@ -49,5 +49,5 @@ def setup_runtime():
     )
     Repository.set_repository(repo)
 
-    controllers._global_controller = None
     controllers.SchismController.ACTIVE_SERVICES = {"service-a"}
+    controllers.set_controller(controllers.EntryPointController())
