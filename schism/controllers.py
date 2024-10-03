@@ -76,7 +76,7 @@ class SchismController(ABC):
     ) -> "Generator[tuple[Type[services.Service], configs.ServiceConfig], None, None]":
         for service, service_config in self.service_configs.items():
             if condition(service_config):
-                yield service, service_config
+                yield service_config.get_service_type(), service_config
 
     def find_service_matching(self, service: "Type[services.Service]") -> "Optional[configs.ServiceConfig]":
         for s in self.service_configs.values():
