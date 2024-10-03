@@ -220,3 +220,10 @@ def activate():
     controller = EntryPointController()
     set_controller(controller)
     return controller
+
+
+def start(app: Awaitable[None]):
+    """Activates Schism's entry point controller and starts the application."""
+    controller = activate()
+    controller.add_launch_task(app)
+    controller.launch()
