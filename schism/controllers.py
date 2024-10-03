@@ -136,7 +136,11 @@ class MonolithicController(SchismController):
 class EntryPointController(SchismController):
     def __init__(self):
         super().__init__()
-        self._env_active_services = set(os.environ.get("SCHISM_ACTIVE_SERVICES", "").split(","))
+        self._env_active_services = {
+            service
+            for service in os.environ.get("SCHISM_ACTIVE_SERVICES", "").split(",")
+            if service.strip()
+        }
         self._servers = {}
 
     @property
