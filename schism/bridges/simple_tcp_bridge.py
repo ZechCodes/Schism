@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from .base import BaseBridge, BridgeClient, BridgeServer
 from schism.configs import SchismConfigModel
+from ..controllers import get_controller
 
 if TYPE_CHECKING:
     from schism.services import Service
@@ -148,7 +149,9 @@ class SimpleTCPBridge(BaseBridge):
 
     @classmethod
     def create_server(cls, service_type: "Type[Service]", config: SimpleTCPConfig):
-        return SimpleTCPServer(service_type, config)
+        server = SimpleTCPServer(service_type, config)
+        get_controller().add_launch_task(server.launch())
+        return server
 
     @classmethod
     def config_factory(cls, bridge_config: str | dict[str, str | int]) -> SimpleTCPConfig:
