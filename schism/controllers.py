@@ -174,6 +174,9 @@ class EntryPointController(SchismController):
 
     def bootstrap(self):
         """Entry point processes need to bootstrap services that are active."""
+        if not self._env_active_services:
+            raise ValueError("No active services were set in SCHISM_ACTIVE_SERVICES")
+
         for service_config in self.active_services.values():
             self._launch_server(service_config)
 
