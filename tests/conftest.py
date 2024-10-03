@@ -26,9 +26,13 @@ class Bridge:
     def create_server(cls, *_):
         controllers.get_controller().create_entry_point("test_service", Bridge("server"))
 
+    @classmethod
+    def config_factory(cls, bridge_config):
+        return bridge_config
 
-@fixture(autouse=True)
-def setup_runtime():
+
+@fixture
+def simple_entry_point_runtime():
     repo = Repository.factory()
     repo.set(
         ServicesConfig,
@@ -49,5 +53,6 @@ def setup_runtime():
     )
     Repository.set_repository(repo)
 
-    controllers.SchismController.ACTIVE_SERVICES = {"service-a"}
-    controllers.set_controller(controllers.EntryPointController())
+    controller = controllers.EntryPointController()
+    controller._env_active_services = {"conftest.ServiceA"}
+    controllers.set_controller(controller)
