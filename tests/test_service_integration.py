@@ -48,4 +48,3 @@ async def test_service_integration():
         service_b.terminate()
         await service_a.wait()
         await service_b.wait()
-        pass
