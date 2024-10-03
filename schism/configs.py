@@ -21,7 +21,17 @@ class ServiceConfig(SchismConfigModel, lax=True):
     bridge: str | dict[str, Any]
 
     def get_bridge_type(self) -> "Type[bridges.BaseBridge]":
-        return self._load_object(self.bridge)
+        match self.bridge:
+            case str() as bridge:
+                pass
+
+            case {"bridge": str() as bridge}:
+                pass
+
+            case _:
+                raise ValueError(f"Invalid bridge configuration for service {self.name}")
+
+        return self._load_object(bridge)
 
     def get_service_type(self) -> "Type[services.Service]":
         return self._load_object(self.service)
