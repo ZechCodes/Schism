@@ -1,9 +1,14 @@
+import sys
+import pathlib
 from functools import lru_cache
 from importlib import import_module
 from typing import Type, TYPE_CHECKING, Any
 
 from nubby import ConfigModel
 from pydantic import BaseModel
+
+
+MAIN_MODULE_NAME = pathlib.Path(sys.modules["__main__"].__file__).stem
 
 if TYPE_CHECKING:
     import schism.bridges as bridges
@@ -42,8 +47,9 @@ class ServiceConfig(SchismConfigModel, lax=True):
     @staticmethod
     @lru_cache
     def _load_object(import_path: str):
-        module, cls = import_path.rsplit(".", 1)
-        return getattr(import_module(module), cls)
+        module_path, cls = import_path.rsplit(".", 1)
+        module = sys.modules["__main__"] if module_path == MAIN_MODULE_NAME else import_module(module_path)
+        return getattr(module, cls)
 
 
 class ServicesConfig(SchismConfigModel, filename="schism.config"):
