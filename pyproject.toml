@@ -7,6 +7,9 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/ZechCodes/Schism"
 
+[tool.poetry.scripts]
+schism = "schism.cli_script:run"
+
 [tool.poetry.dependencies]
 python = "^3.12"
 bevy = "^2.0.2"
