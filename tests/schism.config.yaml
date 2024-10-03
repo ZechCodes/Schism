@@ -1,0 +1,16 @@
+services:
+- bridge:
+    bridge: schism.bridges.simple_tcp_bridge.SimpleTCPBridge
+    host: localhost
+    port: 1234
+  name: service-a
+  service: service_test.ServiceA
+- bridge:
+    bridge: schism.bridges.simple_tcp_bridge.SimpleTCPBridge
+    host: localhost
+    port: 4321
+  name: service-b
+  service: service_test.ServiceB
+- bridge: schism.bridges.simple_tcp_bridge.SimpleTCPClient
+  name: service-c
+  service: service_test.ServiceC
