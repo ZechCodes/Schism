@@ -23,8 +23,6 @@ def _validate_entry_point_name(name: str):
 
 
 class SchismController(ABC):
-    ACTIVE_SERVICES = set(os.environ.get("SCHISM_ACTIVE_SERVICES", "").split(","))
-
     def __init__(self):
         self._service_configs: "Optional[dict[str, configs.ServiceConfig]]" = Optional.Nothing()
         self._active_services: Optional[ServicesConfigMapping] = Optional.Nothing()
@@ -141,6 +139,7 @@ class MonolithicController(SchismController):
 class EntryPointController(SchismController):
     def __init__(self):
         super().__init__()
+        self._env_active_services = set(os.environ.get("SCHISM_ACTIVE_SERVICES", "").split(","))
         self._servers = {}
 
     @property
@@ -152,7 +151,7 @@ class EntryPointController(SchismController):
             case Optional.Nothing():
                 self._active_services = Optional.Some(
                     dict(
-                        self.filter_services(lambda s: s.service in self.ACTIVE_SERVICES)
+                        self.filter_services(lambda s: s.service in self._env_active_services)
                     )
                 )
                 return self.active_services
@@ -169,7 +168,7 @@ class EntryPointController(SchismController):
             case Optional.Nothing():
                 self._remote_services = Optional.Some(
                     dict(
-                        self.filter_services(lambda s: s.service not in self.ACTIVE_SERVICES)
+                        self.filter_services(lambda s: s.service not in self._env_active_services)
                     )
                 )
                 return self.remote_services
