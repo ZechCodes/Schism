@@ -16,6 +16,7 @@ def setup_entry_points(controller: SchismController):
 def launch():
     controller = setup_controller()
     setup_entry_points(controller)
+    controller.launch()
 
 
 launch()
