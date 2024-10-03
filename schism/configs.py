@@ -25,7 +25,7 @@ class ServiceConfig(SchismConfigModel, lax=True):
             case str() as bridge:
                 pass
 
-            case {"bridge": str() as bridge}:
+            case {"type": str() as bridge}:
                 pass
 
             case _:
