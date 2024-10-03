@@ -1,6 +1,7 @@
+import asyncio
 import os
 from abc import ABC, abstractmethod
-from typing import Any, Generator, Type, TypeAlias, Callable
+from typing import Any, Generator, Type, TypeAlias, Callable, Awaitable
 
 from bevy import inject, dependency
 from tramp.optionals import Optional
@@ -29,6 +30,7 @@ class SchismController(ABC):
         self._active_services: Optional[ServicesConfigMapping] = Optional.Nothing()
         self._remote_services: Optional[ServicesConfigMapping] = Optional.Nothing()
         self._entry_points: dict[str, Any] = {}
+        self._launch_tasks: list[Awaitable[None]] = []
 
     @property
     @abstractmethod
@@ -60,6 +62,9 @@ class SchismController(ABC):
                 )
                 return self.service_configs
 
+    def add_launch_task(self, task: Awaitable[None]):
+        self._launch_tasks.append(task)
+
     def create_entry_point(self, name: str, entry_point: Any):
         _validate_entry_point_name(name)
         self._entry_points[name] = entry_point
@@ -88,6 +93,17 @@ class SchismController(ABC):
 
     def is_service_active(self, service: "Type[services.Service]") -> bool:
         return self.get_service_config(service).get_service_type() in self.active_services
+
+    def launch(self):
+        if not self._launch_tasks:
+            return
+
+        asyncio.run(self._run_tasks())
+
+    async def _run_tasks(self):
+        async with asyncio.TaskGroup() as group:
+            for task in self._launch_tasks:
+                await group.create_task(task)
 
     @inject
     def _load_services_configs(
