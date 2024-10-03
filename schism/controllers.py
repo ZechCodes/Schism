@@ -180,7 +180,10 @@ class EntryPointController(SchismController):
 
     def _launch_server(self, service_config: configs.ServiceConfig):
         bridge = service_config.get_bridge_type()
-        self._servers[service_config.service] = bridge.create_server(service_config.get_service_type())
+        self._servers[service_config.service] = bridge.create_server(
+            service_config.get_service_type(),
+            bridge.config_factory(service_config.bridge),
+        )
 
 
 def get_controller() -> SchismController:
