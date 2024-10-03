@@ -13,4 +13,5 @@ class Service:
         # Inject a bridge client to remotely access a service that doesn't exist in the running process
         else:
             config = controller.get_service_config(cls)
-            return config.get_bridge_type().create_client(cls)
+            bridge = config.get_bridge_type()
+            return bridge.create_client(cls, bridge.config_factory(config.bridge))
