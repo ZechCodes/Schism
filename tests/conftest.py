@@ -22,11 +22,11 @@ class Bridge:
         self.acting_as = acting_as
 
     @classmethod
-    def create_client(cls, service: Type[Service]):
+    def create_client(cls, *_):
         return Bridge("client")
 
     @classmethod
-    def create_server(cls, service: Type[Service]):
+    def create_server(cls, *_):
         controllers.get_controller().create_entry_point("test_service", Bridge("server"))
 
 
