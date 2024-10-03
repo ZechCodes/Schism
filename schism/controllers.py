@@ -213,3 +213,9 @@ def set_controller(controller: SchismController):
     global _global_controller
 
     _global_controller = controller
+
+
+def activate():
+    """Activates the entry point controller."""
+    controller = EntryPointController()
+    set_controller(controller)
