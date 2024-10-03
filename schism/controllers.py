@@ -154,7 +154,7 @@ class EntryPointController(SchismController):
                 return self.active_services
 
             case invalid_state:
-                raise ValueError(f"Invalid state: {invalid_state}", Optional.Nothing())
+                raise ValueError(f"Invalid state: {invalid_state}")
 
     @property
     def remote_services(self) -> ServicesConfigMapping:

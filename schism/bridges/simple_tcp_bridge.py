@@ -130,7 +130,6 @@ class SimpleTCPServer(BridgeServer):
                 method = getattr(service, request.method)
                 result.set(await method(*request.args, **request.kwargs))
 
-        print(f"Sending response: {result.to_dict()}")
         response = pickle.dumps(result.to_dict())
         signature = _generate_signature(response)
         length = len(response) + len(signature)
