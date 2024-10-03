@@ -8,7 +8,7 @@ from nubby import ConfigModel
 from pydantic import BaseModel
 
 
-MAIN_MODULE_NAME = pathlib.Path(sys.modules["__main__"].__file__).stem
+MAIN_MODULE_NAME = pathlib.Path(getattr(sys.modules["__main__"], "__file__", "")).stem or None
 
 if TYPE_CHECKING:
     import schism.bridges as bridges
