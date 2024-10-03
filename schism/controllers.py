@@ -219,3 +219,4 @@ def activate():
     """Activates the entry point controller."""
     controller = EntryPointController()
     set_controller(controller)
+    return controller
