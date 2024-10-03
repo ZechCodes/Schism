@@ -20,10 +20,10 @@ Creating a `schism.config.yaml` file in the root of your project will allow you 
 available in your application and how they should be exposed. Bevy then handles injecting the correct client facades
 into your functions so you can interact with the services as if they are still part of the same application.
 
-To launch individual services you just need to set the `SCHISM_ACTIVE_SERVICES` environment variable to a
-comma-separated list of the qualified names of the services you want to run. Schism will then start the appropriate
-bridge servers using the configuration in the `schism.config.yaml` file when you run the `schism.entry_points` module.
-Typically, you should only run a single service per process.
+To launch individual services you either need to set the `SCHISM_ACTIVE_SERVICES` environment variable to a
+comma-separated list of the names of the services you want to run or pass them after the `--services` flag. Schism will
+then start the appropriate bridge servers using the configuration in the `schism.config.yaml` file when you run the
+`schism` command. Typically, you should only run a single service per process.
 
 Here's a basic example of a service that provides a simple greeting.
 
@@ -67,7 +67,7 @@ services:
 To run you must first start the greetings service with this command:
 
 ```bash
-SCHISM_ACTIVE_SERVICES=greeting-service schism
+schism -s greeting-service
 ```
 
 Then you can run the script and that accesses the service by passing `schism.run` the entry point coroutine:
