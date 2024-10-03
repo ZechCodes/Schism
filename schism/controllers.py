@@ -151,7 +151,7 @@ class EntryPointController(SchismController):
 
             case Optional.Nothing():
                 self._active_services = Optional.Some(
-                    dict(self.filter_services(lambda s: s.service in self._env_active_services))
+                    dict(self.filter_services(lambda s: s.name in self._env_active_services))
                 )
                 return self.active_services
 
