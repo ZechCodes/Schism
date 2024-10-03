@@ -1,7 +1,5 @@
 from bevy import inject, dependency
 
-import schism.controllers
-
 from conftest import ServiceA, Bridge
 from pytest_asyncio import fixture
 from schism.controllers import get_controller, set_controller, EntryPointController
