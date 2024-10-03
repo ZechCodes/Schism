@@ -1,6 +1,5 @@
 import os
 from abc import ABC, abstractmethod
-from optparse import Option
 from typing import Any, Generator, Type, TypeAlias, Callable
 
 from bevy import inject, dependency
@@ -8,7 +7,6 @@ from tramp.optionals import Optional
 
 import schism.services as services
 import schism.configs as configs
-import schism.bridges as bridges
 
 ServicesConfigMapping: TypeAlias = "dict[Type[services.Service], configs.ServiceConfig]"
 
