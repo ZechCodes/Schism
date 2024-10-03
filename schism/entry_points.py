@@ -1,9 +1,8 @@
-from schism.controllers import EntryPointController, set_controller, SchismController
+from schism.controllers import activate, SchismController
 
 
 def setup_controller() -> SchismController:
-    controller = EntryPointController()
-    set_controller(controller)
+    controller = activate()
     controller.bootstrap()
     return controller
 
