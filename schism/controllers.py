@@ -44,6 +44,10 @@ class SchismController(ABC):
     def bootstrap(self):
         """Bootstraps the running process to make services available."""
 
+    @abstractmethod
+    def launch(self):
+        """Creates an event loop and runs all launch tasks."""
+
     @property
     def entry_points(self) -> dict[str, Any]:
         return self._entry_points
@@ -92,17 +96,6 @@ class SchismController(ABC):
     def is_service_active(self, service: "Type[services.Service]") -> bool:
         return self.get_service_config(service).get_service_type() in self.active_services
 
-    def launch(self):
-        if not self._launch_tasks:
-            return
-
-        asyncio.run(self._run_tasks())
-
-    async def _run_tasks(self):
-        async with asyncio.TaskGroup() as group:
-            for task in self._launch_tasks:
-                await group.create_task(task)
-
     @inject
     def _load_services_configs(
             self, config: "configs.ServicesConfig" = dependency()
@@ -133,6 +126,10 @@ class MonolithicController(SchismController):
 
     def bootstrap(self):
         """Monolithic processes don't have services that need to be bootstrapped."""
+        return
+
+    def launch(self):
+        """Monoithic processes don't have services that need to be launched."""
         return
 
 
@@ -178,12 +175,23 @@ class EntryPointController(SchismController):
         for service_config in self.active_services.values():
             self._launch_server(service_config)
 
+    def launch(self):
+        if not self._launch_tasks:
+            return
+
+        asyncio.run(self._run_tasks())
+
     def _launch_server(self, service_config: configs.ServiceConfig):
         bridge = service_config.get_bridge_type()
         self._servers[service_config.service] = bridge.create_server(
             service_config.get_service_type(),
             bridge.config_factory(service_config.bridge),
         )
+
+    async def _run_tasks(self):
+        async with asyncio.TaskGroup() as group:
+            for task in self._launch_tasks:
+                await group.create_task(task)
 
 
 def get_controller() -> SchismController:
