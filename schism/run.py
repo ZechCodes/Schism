@@ -5,7 +5,7 @@ from importlib import import_module
 from schism.controllers import activate, SchismController, start
 
 
-def launch_entry_point(services: set[str]):
+def launch_services(services: set[str]):
     controller = setup_controller(services)
     setup_entry_points(controller)
     controller.launch()
@@ -35,23 +35,35 @@ def start_application(module_path: str, entry_point_name: str):
 
     start(entry_point_callback())
 
-if len(sys.argv) > 1 and sys.argv[1] in {"--services", "-s"}:
-    launch_entry_point(
-        {
-            service.strip()
-            for service in sys.argv[2:]
-            if service.strip()
-        }
-    )
 
-elif "SCHISM_ACTIVE_SERVICES" in os.environ:
-    launch_entry_point(
-        {
-            service.strip()
-            for service in os.environ["SCHISM_ACTIVE_SERVICES"].split(",")
-            if service.strip()
-        }
-    )
+def main():
+    match sys.argv[1:]:
+        case ("run", "services", *services) if len(services) > 0:
+            launch_services({
+                service.strip()
+                for service in sys.argv[3:]
+                if service.strip()
+            })
 
-else:
-    start_application()
+        case ("run", entry_point) if "." in entry_point:
+            start_application(*entry_point.rsplit(".", 1))
+
+        case _ if "SCHISM_ACTIVE_SERVICES" in os.environ:
+            launch_services({
+                service.strip()
+                for service in os.environ["SCHISM_ACTIVE_SERVICES"].split(",")
+                if service.strip()
+            })
+
+        case _:
+            print("""Welcome to Schism!
+
+Schism is a simple service autowiring framework for Python. It allows you to write service oriented applications that
+can also be easily be run as monoliths.
+
+Usage:
+    schism run services <service>...    - Run the specified services
+    schism run <module>.<entry_point>   - Run the specified entry point""")
+
+
+main()
