@@ -136,7 +136,7 @@ class MonolithicController(SchismController):
 class EntryPointController(SchismController):
     def __init__(self, active_services: set[str]):
         super().__init__()
-        self._env_active_services = active_services
+        self._active_service_names = active_services
         self._servers = {}
 
     @property
@@ -147,7 +147,7 @@ class EntryPointController(SchismController):
 
             case Optional.Nothing():
                 self._active_services = Optional.Some(
-                    dict(self.filter_services(lambda s: s.name in self._env_active_services))
+                    dict(self.filter_services(lambda s: s.name in self._active_service_names))
                 )
                 return self.active_services
 
@@ -163,7 +163,7 @@ class EntryPointController(SchismController):
             case Optional.Nothing():
                 self._remote_services = Optional.Some(
                     dict(
-                        self.filter_services(lambda s: s.service not in self._env_active_services)
+                        self.filter_services(lambda s: s.service not in self._active_service_names)
                     )
                 )
                 return self.remote_services
