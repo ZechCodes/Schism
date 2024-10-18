@@ -5,14 +5,14 @@ from importlib import import_module
 from schism.controllers import activate, SchismController, start
 
 
-def launch_services(services: set[str]):
-    controller = setup_controller(services)
+def launch_services(service: str):
+    controller = setup_controller(service)
     setup_entry_points(controller)
     controller.launch()
 
 
-def setup_controller(services: set[str]) -> SchismController:
-    controller = activate(services)
+def setup_controller(service: str) -> SchismController:
+    controller = activate(service)
     controller.bootstrap()
     return controller
 
@@ -38,22 +38,14 @@ def start_application(module_path: str, entry_point_name: str):
 
 def main():
     match sys.argv[1:]:
-        case ("run", "services", *services) if len(services) > 0:
-            launch_services({
-                service.strip()
-                for service in sys.argv[3:]
-                if service.strip()
-            })
+        case ("run", "service", str() as service):
+            launch_services(service)
 
-        case ("run", entry_point) if "." in entry_point:
-            start_application(*entry_point.rsplit(".", 1))
+        case ("run", entry_point) if ":" in entry_point:
+            start_application(*entry_point.rsplit(":", 1))
 
-        case _ if "SCHISM_ACTIVE_SERVICES" in os.environ:
-            launch_services({
-                service.strip()
-                for service in os.environ["SCHISM_ACTIVE_SERVICES"].split(",")
-                if service.strip()
-            })
+        case _ if "SCHISM_ACTIVE_SERVICE" in os.environ:
+            launch_services(os.environ["SCHISM_ACTIVE_SERVICE"].strip())
 
         case _:
             print("""Welcome to Schism!

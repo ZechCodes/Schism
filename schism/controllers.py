@@ -135,9 +135,9 @@ class MonolithicController(SchismController):
 
 
 class EntryPointController(SchismController):
-    def __init__(self, active_services: set[str]):
+    def __init__(self, active_service: str):
         super().__init__()
-        self._active_service_names = active_services
+        self._active_service_name = active_service
         self._servers = {}
 
     @property
@@ -148,7 +148,7 @@ class EntryPointController(SchismController):
 
             case Optional.Nothing():
                 self._active_services = Optional.Some(
-                    dict(self.filter_services(lambda s: s.name in self._active_service_names))
+                    dict(self.filter_services(lambda s: s.name == self._active_service_name))
                 )
                 return self.active_services
 
@@ -164,20 +164,16 @@ class EntryPointController(SchismController):
             case Optional.Nothing():
                 self._remote_services = Optional.Some(
                     dict(
-                        self.filter_services(lambda s: s.service not in self._active_service_names)
+                        self.filter_services(lambda s: s.service != self._active_service_name)
                     )
                 )
                 return self.remote_services
 
     def bootstrap(self):
         """Entry point processes need to bootstrap services that are active."""
-        if invalid_services := [
-            active_service
-            for active_service in self._active_service_names
-            if not next(self.filter_services(lambda s: s.name == active_service), False)
-        ]:
+        if not next(self.filter_services(lambda s: s.name == self._active_service_name), False):
                 raise RuntimeError(
-                    f"Unknown service(s): {', '.join(invalid_services)}\n\nAll services must be configured in the "
+                    f"Unknown service: {self._active_service_name}\n\nAll services must be configured in the "
                     f"schism.config file."
                 )
 
@@ -223,10 +219,9 @@ def set_controller(controller: SchismController):
     _global_controller = controller
 
 
-def activate(services: set[str] | None = None) -> SchismController:
+def activate(service: str = "") -> SchismController:
     """Activates the entry point controller."""
-    services = services or set()
-    controller = EntryPointController(services)
+    controller = EntryPointController(service)
     set_controller(controller)
     return controller
 
