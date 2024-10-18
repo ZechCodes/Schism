@@ -22,13 +22,18 @@ def setup_entry_points(controller: SchismController):
         globals()[name] = entry_point
 
 
-def start_application():
-    module_path, entry_point_name = sys.argv[1].rsplit(".", 1)
-    module = import_module(module_path)
-    entry_point = getattr(module, entry_point_name)
+def start_application(module_path: str, entry_point_name: str):
+    try:
+        module = import_module(module_path)
+    except ModuleNotFoundError as e:
+        raise RuntimeError(f"The specified entrypoint module {module_path!r} could not be found.") from e
 
-    start(entry_point())
+    try:
+        entry_point_callback = getattr(module, entry_point_name)
+    except AttributeError as e:
+        raise RuntimeError(f"The specified entrypoint callback {entry_point_name!r} could not be found in the {module_path!r} module.") from e
 
+    start(entry_point_callback())
 
 if len(sys.argv) > 1 and sys.argv[1] in {"--services", "-s"}:
     launch_entry_point(
