@@ -170,6 +170,16 @@ class EntryPointController(SchismController):
 
     def bootstrap(self):
         """Entry point processes need to bootstrap services that are active."""
+        if invalid_services := [
+            active_service
+            for active_service in self._active_service_names
+            if not next(self.filter_services(lambda s: s.name == active_service), False)
+        ]:
+                raise RuntimeError(
+                    f"Unknown service(s): {', '.join(invalid_services)}\n\nAll services must be configured in the "
+                    f"schism.config file."
+                )
+
         for service_config in self.active_services.values():
             self._launch_server(service_config)
 
