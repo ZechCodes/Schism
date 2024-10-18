@@ -3,6 +3,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import Any, Generator, Type, TypeAlias, Callable, Awaitable
 
+import bevy
 from bevy import inject, dependency
 from tramp.optionals import Optional
 
@@ -181,6 +182,7 @@ class EntryPointController(SchismController):
                 )
 
         for service_config in self.active_services.values():
+            bevy.get_repository().get(service_config.get_service_type())  # Create the service instance
             self._launch_server(service_config)
 
     def launch(self):
