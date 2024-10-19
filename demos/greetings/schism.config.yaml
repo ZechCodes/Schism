@@ -5,5 +5,4 @@ services:
     service: greetings:GreetingService
     bridge:
       type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
-      host: localhost
-      port: 1234
+      serve_on: 0.0.0.0:1234

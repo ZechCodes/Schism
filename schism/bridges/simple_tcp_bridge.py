@@ -28,12 +28,31 @@ class RequestPayload(BaseModel):
 
 
 class SimpleTCPConfig(SchismConfigModel, lax=True):
-    host: str
-    port: int
+    serve_on: str
+    client: str
 
 
 class SimpleTCPClient(BridgeClient):
     config: SimpleTCPConfig
+
+    @property
+    @lru_cache
+    def host(self) -> str:
+        return (
+            self.config.client
+            if self.config.client
+            else self.config.serve_on
+        ).split(":")[0]
+
+    @property
+    def port(self) -> int:
+        return int(
+            (
+                self.config.client
+                if self.config.client
+                else self.config.serve_on
+            ).split(":")[1]
+        )
 
     def __getattr__(self, item):
         return partial(self.__make_request, item)
@@ -75,8 +94,18 @@ class SimpleTCPClient(BridgeClient):
 class SimpleTCPServer(BridgeServer):
     config: SimpleTCPConfig
 
+    @property
+    @lru_cache
+    def host(self) -> str:
+        return self.config.serve_on.split(":")[0]
+
+    @property
+    @lru_cache
+    def port(self) -> int:
+        return int(self.config.serve_on.split(":")[1])
+
     async def launch(self):
-        server = await asyncio.start_server(self._handle_request, self.config.host, self.config.port)
+        server = await asyncio.start_server(self._handle_request, self.host, self.port)
 
         async with server:
             await server.serve_forever()
@@ -122,11 +151,14 @@ class SimpleTCPBridge(BaseBridge):
     @classmethod
     def config_factory(cls, bridge_config: str | dict[str, str | int]) -> SimpleTCPConfig:
         match bridge_config:
-            case str():
-                return SimpleTCPConfig(host="localhost", port=12321)
+            case str() as serve_on:
+                return SimpleTCPConfig(serve_on=serve_on, client=serve_on)
 
-            case {"host": str() as host, "port": int() as port}:
-                return SimpleTCPConfig(host=host, port=port)
+            case {"serve_on": str() as serve_on, "client": str() as client}:
+                return SimpleTCPConfig(serve_on=serve_on, client=client)
+
+            case {"serve_on": str() as serve_on}:
+                return SimpleTCPConfig(serve_on=serve_on, client=serve_on)
 
             case _:
                 raise ValueError(f"Invalid bridge configuration for {cls.__name__}: {bridge_config}")

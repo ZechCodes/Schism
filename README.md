@@ -55,8 +55,7 @@ services:
     service: greetings:GreetingService
     bridge:
       type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
-      host: localhost
-      port: 1234
+      serve_on: localhost:1234
 ```
 
 To run you must first start the greetings service with this command:

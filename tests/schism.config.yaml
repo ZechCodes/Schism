@@ -1,13 +1,11 @@
 services:
 - bridge:
     type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
-    host: localhost
-    port: 1234
+    serve_on: localhost:1234
   name: service-a
   service: service_test:ServiceA
 - bridge:
     type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
-    host: localhost
-    port: 4321
+    serve_on: localhost:4321
   name: service-b
   service: service_test:ServiceB
