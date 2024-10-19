@@ -1,3 +1,32 @@
+"""The Simple TCP Bridge provides a somewhat secure TCP client and server implementation for calling methods of a
+service. Parameters, return values, and exceptions are passed using pickles and are secured by signing each payload
+using a SHA256 hash salted with a secret key.
+
+The secret key can be changed by setting the SCHISM_TCP_BRIDGE_SECRET environment variable. This should provide some
+assurance that the pickles being passed are safe.
+
+In the schism.config file it is possible to set the host and port that a service's TCP bridge server should be exposed
+on and that the client should connect to.
+
+Here's an example yaml config:
+
+    services:
+      - name: example
+        service: example:Example
+        bridge:
+          type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
+          serve_on: 0.0.0.0:1234
+
+It is also possible to configure the client separately:
+
+    services:
+      - name: example
+        service: example:Example
+        bridge:
+          type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
+          serve_on: 0.0.0.0:1234
+          client: example.com:4321
+"""
 import asyncio
 import contextlib
 import hashlib
@@ -42,6 +71,9 @@ async def connect(host: str, port: int) -> tuple[StreamReader, StreamWriter]:
 
 
 async def read[TResponse: (dict[str, Any], RequestPayload)](reader: StreamReader) -> TResponse:
+    """When reading from a TCP connection first read 4 bytes to get the content length. Next read the 64 byte signature.
+    Next read the content and validate the signature matches. If it does then it is safe to load the payload pickle.
+    """
     length_bytes = await reader.read(4)
     signature = await reader.read(64)
 
@@ -53,6 +85,9 @@ async def read[TResponse: (dict[str, Any], RequestPayload)](reader: StreamReader
     return pickle.loads(payload)
 
 
+async def send(data: Any, writer: StreamWriter):
+    """When writing to a TCP connection first write the 4 byte content length of the pickled data, then the 64 byte
+    signature, and finally write the pickle."""
     payload = pickle.dumps(data)
     writer.write(len(payload).to_bytes(4))
     writer.write(_generate_signature(payload))
