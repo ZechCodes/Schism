@@ -63,7 +63,14 @@ class SimpleTCPClient(BridgeClient):
         signature = _generate_signature(data)
         payload = signature + data
         length = len(payload)
-        reader, writer = await asyncio.open_connection(self.config.host, self.config.port)
+
+        try:
+            reader, writer = await asyncio.open_connection(self.host, self.port)
+        except OSError as e:
+            raise RuntimeError(
+                f"Unable to connect to {self.service.__module__}.{self.service.__qualname__} service on {self.host}:{self.port}"
+            ) from e
+
         writer.write(length.to_bytes(4) + payload)
         await writer.drain()
 
