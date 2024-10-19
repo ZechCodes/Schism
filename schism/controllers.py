@@ -146,7 +146,7 @@ class MonolithicController(SchismController):
         return
 
 
-class EntryPointController(SchismController):
+class DistributedController(SchismController):
     def __init__(self, active_service: str):
         super().__init__()
         self._active_service_name = active_service
