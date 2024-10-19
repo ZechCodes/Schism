@@ -13,7 +13,8 @@ The demo can also be run in a single process by running it as a normal python sc
 changes made in the runtime.
 """
 from bevy import inject, dependency
-from schism import Service
+from schism import Service, start_app
+
 
 remote = True
 
@@ -39,7 +40,5 @@ async def main():
 
 
 if __name__ == "__main__":
-    import asyncio
-
     remote = False
-    asyncio.run(main())
+    start_app(main())
