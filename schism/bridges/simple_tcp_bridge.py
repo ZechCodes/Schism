@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from .base import BaseBridge, BridgeClient, BridgeServer
 from schism.configs import SchismConfigModel
-from ..controllers import get_controller
+from schism.controllers import get_controller
 
 if TYPE_CHECKING:
     from schism.services import Service
