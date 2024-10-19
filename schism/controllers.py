@@ -228,5 +228,5 @@ def set_controller(controller: SchismController):
     _global_controller = controller
 
 
-def start_app(callback: Awaitable[None]):
-    MonolithicController.start_application(callback)
+def start_app(app_callback: Awaitable[None]):
+    MonolithicController.start_application(app_callback)
