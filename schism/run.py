@@ -41,10 +41,10 @@ def start_application(module_path: str, application_callback_name: str):
 
 def main(argv: list[str]):
     match argv:
-        case ("run", "service", str() as service):
+        case ["run", "service", str() as service]:
             start_services(service)
 
-        case ("run", str() as application_import) if ":" in application_import:
+        case ["run", str() as application_import] if ":" in application_import:
             start_application(*application_import.split(":"))
 
         case _ if "SCHISM_ACTIVE_SERVICE" in os.environ:
