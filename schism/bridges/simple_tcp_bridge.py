@@ -38,7 +38,7 @@ class SimpleTCPClient(BridgeClient):
     def __getattr__(self, item):
         return partial(self.__make_request, item)
 
-    async def __make_request(self, method, args, kwargs):
+    async def __make_request(self, method, *args, **kwargs):
         request = RequestPayload(method=method, args=args, kwargs=kwargs)
         data = pickle.dumps(request)
         signature = _generate_signature(data)
