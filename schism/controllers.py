@@ -118,7 +118,7 @@ class SchismController(ABC):
 
     @classmethod
     def start_application(cls, app: Awaitable[None]):
-        """Activates Schism's entry point controller and starts the application."""
+        """Activates the controller and starts the application."""
         controller = cls.activate()
         controller.add_launch_task(app)
         controller.launch()
