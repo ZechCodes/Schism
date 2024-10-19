@@ -35,7 +35,7 @@ Here's a basic example of a service that provides a simple greeting.
 ```python
 # greetings.py
 from bevy import inject, dependency
-from schism import Service
+from schism import Service, start_app
 
 class GreetingService(Service):
     async def greet(self, name: str) -> str:
@@ -53,9 +53,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    import asyncio
-
-    asyncio.run(main())
+    start_app(main())  # Activate a Schism controller and launch the app
 ```
 Here is the corresponding `schism.config.yaml` file:
 
