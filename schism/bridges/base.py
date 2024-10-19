@@ -5,6 +5,12 @@ if TYPE_CHECKING:
     from schism.services import Service
 
 
+class RemoteError(Exception):
+    """RemoteError is used to wrap a stacktrace passed from a service to a client. This error type is never raised on
+    its own, instead it is given as the cause for an exception that is raised by the client to propagate an error that
+    occurred on the server."""
+
+
 class BridgeClient:
     def __init__(self, service: "Type[Service]", config: Any):
         self.service = service
