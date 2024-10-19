@@ -1,6 +1,7 @@
 import os
 import sys
 from importlib import import_module
+from typing import Any
 
 from schism.controllers import SchismController, DistributedController
 
@@ -22,7 +23,7 @@ def setup_entry_points(controller: SchismController):
         globals()[name] = entry_point
 
 
-def start_application(module_path: str, application_callback_name: str):
+def start_application(module_path: str, application_callback_name: str, settings: dict[str, Any] | None = None):
     try:
         module = import_module(module_path)
     except ModuleNotFoundError as e:
@@ -36,7 +37,7 @@ def start_application(module_path: str, application_callback_name: str):
             f"{module_path!r} module."
         ) from e
 
-    DistributedController.start_application(application_callback())
+    DistributedController.start_application(application_callback(**settings or {}))
 
 
 def main(argv: list[str]):
