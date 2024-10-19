@@ -145,8 +145,13 @@ class MonolithicController(SchismController):
         return {}
 
     def bootstrap(self):
-        """Monolithic processes don't have services that need to be bootstrapped."""
-        return
+        """Create all services."""
+        for service_config in self.active_services.values():
+            bevy.get_repository().get(service_config.get_service_type())  # Create the service instance
+
+    def launch(self):
+        self.bootstrap()
+        super().launch()
 
 
 class DistributedController(SchismController):
