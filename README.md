@@ -51,12 +51,12 @@ Here is the corresponding `schism.config.yaml` file:
 launch:
   app: greetings:main
 services:
-  - bridge:
+  - name: greeting
+    service: greetings:GreetingService
+    bridge:
       type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
       host: localhost
       port: 1234
-    name: greeting
-    service: greetings:GreetingService
 ```
 
 To run you must first start the greetings service with this command:
