@@ -12,12 +12,21 @@ class RemoteError(Exception):
 
 
 class BridgeClient:
+    """Bridge clients are facades for service types. These client facades are injected in place of the services when
+    using the DistributedController.
+
+    It is important that bridge clients raise exceptions raised on the service server so that they can be properly
+    propagated and handled by the client code."""
     def __init__(self, service: "Type[Service]", config: Any):
         self.service = service
         self.config = config
 
 
 class BridgeServer(ABC):
+    """Bridge servers provide a publicly accessible API for calling a service type.
+
+    It is important that bridge servers capture exceptions raised while calling the service and pass them to the client
+    so that they can be properly propagated and handled by the client code."""
     def __init__(self, service: "Type[Service]", config: Any):
         self.service = service
         self.config = config
@@ -28,6 +37,7 @@ class BridgeServer(ABC):
 
 
 class BaseBridge(ABC):
+    """Bridges provide methods for creating the corresponding configs, clients, and servers."""
     @classmethod
     @abstractmethod
     def create_client(cls, service_type: "Type[Service]", config: Any) -> BridgeClient:
