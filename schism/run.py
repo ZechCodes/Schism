@@ -39,8 +39,8 @@ def start_application(module_path: str, application_callback_name: str):
     DistributedController.start_application(application_callback())
 
 
-def main():
-    match sys.argv[1:]:
+def main(argv: list[str]):
+    match argv:
         case ("run", "service", str() as service):
             start_services(service)
 
@@ -61,4 +61,5 @@ Usage:
     schism run <module>:<entry_point>   - Run the given application""")
 
 
-main()
+if __name__ == "__main__":
+    main(["run"] + sys.argv[1:])
