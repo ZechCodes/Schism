@@ -53,12 +53,10 @@ async def read[TResponse: (dict[str, Any], RequestPayload)](reader: StreamReader
     return pickle.loads(payload)
 
 
-async def send(payload: Any, writer: StreamWriter):
-    data = pickle.dumps(payload)
-    signature = _generate_signature(data)
-    payload = signature + data
-    length = len(payload)
-    writer.write(length.to_bytes(4) + payload)
+    payload = pickle.dumps(data)
+    writer.write(len(payload).to_bytes(4))
+    writer.write(_generate_signature(payload))
+    writer.write(payload)
     await writer.drain()
 
 
