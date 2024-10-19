@@ -1,8 +1,6 @@
 # Schism
 
-Schism is a service framework designed to simplify the process of splitting a single application into multiple services.
-It provides autowiring capabilities that make modularity straightforward in monolithic applications and facilitates code
-sharing in microservices architectures.
+Schism is a service framework designed to simplify the process of splitting a single application into multiple services. It provides autowiring capabilities that make modularity straightforward in monolithic applications and facilitates code sharing in microservices architectures.
 
 ## Installation
 
@@ -12,21 +10,13 @@ pip install schism
 
 ## Usage
 
-Schism is designed to have the smallest possible API surface area. You just need to create a service type that inherits
-from `schism.Service`. You can use [Bevy's](https://github.com/ZechCodes/Bevy) dependency injection to inject services
-into any function.
+Schism is designed to have the smallest possible API surface area. You just need to create a service type that inherits from `schism.Service`. You can use [Bevy's](https://github.com/ZechCodes/Bevy) dependency injection to inject services into any function.
 
-Creating a `schism.config.yaml` file in the root of your project will allow you to define the services that should be
-available in your application and how they should be exposed. Bevy then handles injecting the correct client facades
-into your functions so you can interact with the services as if they are still part of the same application.
+Creating a `schism.config.yaml` file in the root of your project will allow you to define the services that should be available in your application and how they should be exposed. Bevy then handles injecting the correct client facades into your functions so you can interact with the services as if they are still part of the same application. 
 
-To launch a service either set the `SCHISM_ACTIVE_SERVICE` environment variable to the name of the service to run using
-the `schism run` command. Alternatively pass the name to the `schism run service` command. Schism then starts the
-appropriate bridge servers using the configuration in the `schism.config.yaml`.
+To launch a service either set the `SCHISM_ACTIVE_SERVICE` environment variable to the name of the service to run using the `schism run` command. Alternatively pass the name to the `schism run service` command. Schism then starts the  appropriate bridge servers using the configuration in the `schism.config.yaml`.
 
-To run a client application that understands the running services use the `schism run` command. Pass it the desired
-module and callback (ex. `module.path:callback`) that you want to run. Schism handles injecting the appropriate service
-client facades into the runtime before running the callback.
+To run a client application that understands the running services use the `schism run` command. Pass it the desired  module and callback (ex. `module.path:callback`) that you want to run (alternatively set up a launch config). Schism handles injecting the appropriate service client facades into the runtime before running the callback.
 
 ### Example
 
