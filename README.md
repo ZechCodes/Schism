@@ -48,6 +48,8 @@ if __name__ == "__main__":
 Here is the corresponding `schism.config.yaml` file:
 
 ```yaml
+launch:
+  app: greetings:main
 services:
   - bridge:
       type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
@@ -66,7 +68,7 @@ schism run service greeting
 Then you can run the script and that accesses the service by passing `schism.run` the entry point coroutine:
 
 ```bash
-schism run greetings:main
+schism run
 ```
 
 Alternatively you can run it as a normal Python script with no client facades where everything runs in a single process.
