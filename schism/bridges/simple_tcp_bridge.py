@@ -1,9 +1,11 @@
 import asyncio
+import contextlib
 import hashlib
 import os
 import pickle
+from asyncio import StreamReader, StreamWriter
 from functools import lru_cache, partial
-from typing import Type, TYPE_CHECKING
+from typing import Any, Type, TYPE_CHECKING
 
 from bevy import get_repository
 from pydantic import BaseModel
@@ -32,6 +34,33 @@ class SimpleTCPConfig(SchismConfigModel, lax=True):
     client: str
 
 
+async def connect(host: str, port: int) -> tuple[StreamReader, StreamWriter]:
+    try:
+        return await asyncio.open_connection(host, port)
+    except OSError as e:
+        raise RuntimeError(f"Unable to connect to service on {host}:{port}") from e
+
+
+async def read[TResponse: (dict[str, Any], RequestPayload)](reader: StreamReader) -> TResponse:
+    length_bytes = await reader.read(4)
+    length = int.from_bytes(length_bytes)
+    payload = await reader.read(length)
+    signature, data = payload[:64], payload[64:]
+    if signature != _generate_signature(data):
+        raise ValueError(f"Received an invalid signature")
+
+    return pickle.loads(data)
+
+
+async def send(payload: Any, writer: StreamWriter):
+    data = pickle.dumps(payload)
+    signature = _generate_signature(data)
+    payload = signature + data
+    length = len(payload)
+    writer.write(length.to_bytes(4) + payload)
+    await writer.drain()
+
+
 class SimpleTCPClient(BridgeClient):
     config: SimpleTCPConfig
 
@@ -58,44 +87,27 @@ class SimpleTCPClient(BridgeClient):
         return partial(self.__make_request, item)
 
     async def __make_request(self, method, *args, **kwargs):
-        request = RequestPayload(method=method, args=args, kwargs=kwargs)
-        data = pickle.dumps(request)
-        signature = _generate_signature(data)
-        payload = signature + data
-        length = len(payload)
-
-        try:
-            reader, writer = await asyncio.open_connection(self.host, self.port)
-        except OSError as e:
-            raise RuntimeError(
-                f"Unable to connect to {self.service.__module__}.{self.service.__qualname__} service on {self.host}:{self.port}"
-            ) from e
-
-        writer.write(length.to_bytes(4) + payload)
-        await writer.drain()
-
-        length_bytes = await reader.read(4)
-        length = int.from_bytes(length_bytes)
-        payload = await reader.read(length)
-        signature, data = payload[:64], payload[64:]
-        if signature != _generate_signature(data):
-            raise ValueError(
-                f"Received an invalid signature from the service {self.service.__module__}.{self.service.__name__}"
+        reader, writer = await connect(self.host, self.port)
+        with contextlib.closing(writer):
+            await send(
+                RequestPayload(method=method, args=args, kwargs=kwargs),
+                writer,
             )
+            match await read(reader):
+                case {"status": "error", "data": data}:
+                    raise data["error"] from RemoteError(
+                        f"\n"
+                        f"{''.join(data['traceback'])}\n"
+                        f"---------------------------------------------\n"
+                        f"The above stacktrace is from a remote service\n"
+                        f"---------------------------------------------"
+                    )
 
-        response = pickle.loads(data)
-        if response["status"] == "error":
-            remote_error = (
-                f"\n"
-                f"{''.join(response['data']['traceback'])}\n"
-                f"---------------------------------------------\n"
-                f"The above stacktrace is from a remote service\n"
-                f"---------------------------------------------"
-            )
-            error = response["data"]["error"]
-            raise error from RemoteError(remote_error)
+                case {"data": data}:
+                    return data
 
-        return response["data"]
+                case _:
+                    raise RuntimeError("Impossible State, server response must be malformed.")
 
 
 class SimpleTCPServer(BridgeServer):
@@ -118,28 +130,16 @@ class SimpleTCPServer(BridgeServer):
             await server.serve_forever()
 
     async def _handle_request(self, reader, writer):
-        with ResponseBuilder() as result:
-            length_bytes = await reader.read(4)
-            length = int.from_bytes(length_bytes)
+        with contextlib.closing(writer):
+            with ResponseBuilder() as result:
+                request: RequestPayload = await read(reader)
 
-            payload = await reader.read(length)
-            signature, data = payload[:64], payload[64:]
-            if signature != _generate_signature(data):
-                raise ValueError("Invalid signature")
-
-            else:
-                request: RequestPayload = pickle.loads(data)
                 service = get_repository().get(self.service)
                 method = getattr(service, request.method)
+
                 result.set(await method(*request.args, **request.kwargs))
 
-        response = pickle.dumps(result.to_dict())
-        signature = _generate_signature(response)
-        length = len(response) + len(signature)
-        writer.write(length.to_bytes(4) + signature + response)
-
-        await writer.drain()
-        writer.close()
+            await send(result.to_dict(), writer)
 
 
 class SimpleTCPBridge(BaseBridge):
