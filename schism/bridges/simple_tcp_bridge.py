@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import os
 import pickle
+from functools import lru_cache, partial
 from typing import Type, TYPE_CHECKING
 
 from bevy import get_repository
@@ -69,7 +70,7 @@ class SimpleTCPClient(BridgeClient):
     config: SimpleTCPConfig
 
     def __getattr__(self, item):
-        return lambda *a, **k: self.__make_request(item, a, k)
+        return partial(self.__make_request, item)
 
     async def __make_request(self, method, args, kwargs):
         request = RequestPayload(method=method, args=args, kwargs=kwargs)
