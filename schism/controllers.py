@@ -1,6 +1,6 @@
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Any, Generator, Type, TypeAlias, Callable, Awaitable
+from typing import Any, Generator, Type, Callable, Awaitable
 
 import bevy
 from bevy import inject, dependency
@@ -9,7 +9,7 @@ from tramp.optionals import Optional
 import schism.services as services
 import schism.configs as configs
 
-ServicesConfigMapping: TypeAlias = "dict[Type[services.Service], configs.ServiceConfig]"
+type ServicesConfigMapping = dict[Type[services.Service], configs.ServiceConfig]
 
 _global_controller = None
 
