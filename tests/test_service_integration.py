@@ -19,10 +19,10 @@ def setup_service_runtime():
 @pytest.mark.asyncio
 async def test_service_integration():
     service_a = await asyncio.create_subprocess_shell(
-        "python -m schism.run run service service-a",
+        "python -m schism.run service service-a",
     )
     service_b = await asyncio.create_subprocess_shell(
-        "SCHISM_ACTIVE_SERVICE=service-b python -m schism.run run service",
+        "SCHISM_ACTIVE_SERVICE=service-b python -m schism.run service",
     )
     await asyncio.sleep(1)
 
