@@ -20,6 +20,11 @@ class SchismConfigModel(BaseModel, ConfigModel, lax=True):
         return self.model_dump()
 
 
+class LaunchConfig(SchismConfigModel, lax=True):
+    app: str
+    settings: dict[str, Any] | None = None
+
+
 class ServiceConfig(SchismConfigModel, lax=True):
     name: str
     service: str
@@ -54,3 +59,4 @@ class ServiceConfig(SchismConfigModel, lax=True):
 
 class ApplicationConfig(SchismConfigModel, filename="schism.config"):
     services: list[ServiceConfig]
+    launch: LaunchConfig | None = None
