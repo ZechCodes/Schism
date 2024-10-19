@@ -8,6 +8,7 @@ from bevy import get_repository
 from pydantic import BaseModel
 
 from .base import BaseBridge, BridgeClient, BridgeServer
+from .bridge_helpers import ResponseBuilder
 from schism.configs import SchismConfigModel
 from schism.controllers import get_controller
 
