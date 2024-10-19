@@ -103,6 +103,19 @@ class SchismController(ABC):
         for service_config in config.services:
             yield service_config.service, service_config
 
+    @classmethod
+    def activate[Controller: SchismController](cls: Type[Controller], service: str = "") -> Controller:
+        controller = cls(service)
+        set_controller(controller)
+        return controller
+
+    @classmethod
+    def start_application(cls, app: Awaitable[None]):
+        """Activates Schism's entry point controller and starts the application."""
+        controller = cls.activate()
+        controller.add_launch_task(app)
+        controller.launch()
+
 
 class MonolithicController(SchismController):
     @property
@@ -216,17 +229,3 @@ def set_controller(controller: SchismController):
     global _global_controller
 
     _global_controller = controller
-
-
-def activate(service: str = "") -> SchismController:
-    """Activates the entry point controller."""
-    controller = EntryPointController(service)
-    set_controller(controller)
-    return controller
-
-
-def start(app: Awaitable[None]):
-    """Activates Schism's entry point controller and starts the application."""
-    controller = activate()
-    controller.add_launch_task(app)
-    controller.launch()
