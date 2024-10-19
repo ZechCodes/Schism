@@ -98,7 +98,7 @@ class SchismController(ABC):
 
     @inject
     def _load_services_configs(
-            self, config: "configs.ServicesConfig" = dependency()
+            self, config: "configs.ApplicationConfig" = dependency()
     ) -> "Generator[tuple[str, configs.ServiceConfig], None, None]":
         for service_config in config.services:
             yield service_config.service, service_config

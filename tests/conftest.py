@@ -2,7 +2,7 @@ from bevy import Repository
 from pytest_asyncio import fixture
 
 from schism.controllers import DistributedController
-from schism.configs import ServicesConfig
+from schism.configs import ApplicationConfig
 from schism.services import Service
 import schism.controllers as controllers
 
@@ -36,8 +36,8 @@ class Bridge:
 def simple_entry_point_runtime():
     repo = Repository.factory()
     repo.set(
-        ServicesConfig,
-        ServicesConfig(
+        ApplicationConfig,
+        ApplicationConfig(
             services = [
                 {
                     "name": "service-a",

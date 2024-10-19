@@ -52,5 +52,5 @@ class ServiceConfig(SchismConfigModel, lax=True):
         return getattr(module, attr)
 
 
-class ServicesConfig(SchismConfigModel, filename="schism.config"):
+class ApplicationConfig(SchismConfigModel, filename="schism.config"):
     services: list[ServiceConfig]
