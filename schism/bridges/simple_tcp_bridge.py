@@ -27,40 +27,6 @@ class RequestPayload(BaseModel):
     kwargs: dict
 
 
-class RemoteError(Exception):
-    pass
-
-
-class ResponseBuilder:
-    def __init__(self):
-        self.status = "success"
-        self.data = None
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if exc_type is not None:
-            self.status = "error"
-            self.data = {
-                "error": exc_val,
-                "traceback": traceback.format_exception(exc_type, exc_val, exc_tb),
-                "context": exc_val.__context__,
-                "cause": exc_val.__cause__,
-            }
-
-        return True
-
-    def set(self, data):
-        self.data = data
-
-    def to_dict(self):
-        return {
-            "status": self.status,
-            "data": self.data,
-        }
-
-
 class SimpleTCPConfig(SchismConfigModel, lax=True):
     host: str
     port: int
