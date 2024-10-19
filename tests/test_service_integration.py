@@ -3,7 +3,7 @@ import asyncio
 import pytest
 from bevy import Repository
 
-from schism import activate
+from schism.controllers import DistributedController
 
 from service_test import ServiceC
 
@@ -13,16 +13,16 @@ def setup_service_runtime():
     repo = Repository.factory()
     Repository.set_repository(repo)
 
-    activate()
+    DistributedController.activate()
 
 
 @pytest.mark.asyncio
 async def test_service_integration():
     service_a = await asyncio.create_subprocess_shell(
-        "python -m schism.run --services service-a",
+        "python -m schism.run run service service-a",
     )
     service_b = await asyncio.create_subprocess_shell(
-        "SCHISM_ACTIVE_SERVICES=service-b python -m schism.run",
+        "SCHISM_ACTIVE_SERVICE=service-b python -m schism.run run service",
     )
     await asyncio.sleep(1)
 

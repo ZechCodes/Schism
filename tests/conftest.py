@@ -1,7 +1,7 @@
 from bevy import Repository
 from pytest_asyncio import fixture
 
-from schism import activate
+from schism.controllers import DistributedController
 from schism.configs import ServicesConfig
 from schism.services import Service
 import schism.controllers as controllers
@@ -54,4 +54,4 @@ def simple_entry_point_runtime():
     )
     Repository.set_repository(repo)
 
-    activate()
+    DistributedController.activate()
