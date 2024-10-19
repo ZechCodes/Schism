@@ -54,8 +54,8 @@ Schism is a simple service autowiring framework for Python. It allows you to wri
 can also be easily be run as monoliths.
 
 Usage:
-    schism run services <service>...    - Run the specified services
-    schism run <module>.<entry_point>   - Run the specified entry point""")
+    schism run service <service>        - Run the given service
+    schism run <module>:<entry_point>   - Run the given application""")
 
 
 main()
