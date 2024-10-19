@@ -47,9 +47,9 @@ class ServiceConfig(SchismConfigModel, lax=True):
     @staticmethod
     @lru_cache
     def _load_object(import_path: str):
-        module_path, cls = import_path.rsplit(".", 1)
+        module_path, attr = import_path.rsplit(":", 1)
         module = sys.modules["__main__"] if module_path == MAIN_MODULE_NAME else import_module(module_path)
-        return getattr(module, cls)
+        return getattr(module, attr)
 
 
 class ServicesConfig(SchismConfigModel, filename="schism.config"):
