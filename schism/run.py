@@ -2,17 +2,17 @@ import os
 import sys
 from importlib import import_module
 
-from schism.controllers import activate, SchismController, start
+from schism.controllers import SchismController, DistributedController
 
 
-def launch_services(service: str):
+def start_services(service: str):
     controller = setup_controller(service)
     setup_entry_points(controller)
     controller.launch()
 
 
 def setup_controller(service: str) -> SchismController:
-    controller = activate(service)
+    controller = DistributedController.activate(service)
     controller.bootstrap()
     return controller
 
@@ -22,30 +22,33 @@ def setup_entry_points(controller: SchismController):
         globals()[name] = entry_point
 
 
-def start_application(module_path: str, entry_point_name: str):
+def start_application(module_path: str, application_callback_name: str):
     try:
         module = import_module(module_path)
     except ModuleNotFoundError as e:
-        raise RuntimeError(f"The specified entrypoint module {module_path!r} could not be found.") from e
+        raise RuntimeError(f"The specified application module {module_path!r} could not be found.") from e
 
     try:
-        entry_point_callback = getattr(module, entry_point_name)
+        application_callback = getattr(module, application_callback_name)
     except AttributeError as e:
-        raise RuntimeError(f"The specified entrypoint callback {entry_point_name!r} could not be found in the {module_path!r} module.") from e
+        raise RuntimeError(
+            f"The specified application callback {application_callback_name!r} could not be found in the "
+            f"{module_path!r} module."
+        ) from e
 
-    start(entry_point_callback())
+    DistributedController.start_application(application_callback())
 
 
 def main():
     match sys.argv[1:]:
         case ("run", "service", str() as service):
-            launch_services(service)
+            start_services(service)
 
-        case ("run", entry_point) if ":" in entry_point:
-            start_application(*entry_point.rsplit(":", 1))
+        case ("run", str() as application_import) if ":" in application_import:
+            start_application(*application_import.split(":"))
 
         case _ if "SCHISM_ACTIVE_SERVICE" in os.environ:
-            launch_services(os.environ["SCHISM_ACTIVE_SERVICE"].strip())
+            start_services(os.environ["SCHISM_ACTIVE_SERVICE"].strip())
 
         case _:
             print("""Welcome to Schism!
