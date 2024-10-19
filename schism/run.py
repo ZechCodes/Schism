@@ -3,6 +3,9 @@ import sys
 from importlib import import_module
 from typing import Any
 
+from bevy import inject, dependency
+
+from schism.configs import ApplicationConfig
 from schism.controllers import SchismController, DistributedController
 
 
@@ -40,6 +43,13 @@ def start_application(module_path: str, application_callback_name: str, settings
     DistributedController.start_application(application_callback(**settings or {}))
 
 
+@inject
+def start_application_using_config(config: ApplicationConfig = dependency()):
+    if config.launch is None:
+        raise RuntimeError("No launch config exists in schism.config")
+
+    start_application(*config.launch.app.split(":"), settings=config.launch.settings)
+
 def main(argv: list[str]):
     match argv:
         case ["run", "service", str() as service]:
@@ -47,6 +57,9 @@ def main(argv: list[str]):
 
         case ["run", str() as application_import] if ":" in application_import:
             start_application(*application_import.split(":"))
+
+        case ["run"]:
+            start_application_using_config()
 
         case _ if "SCHISM_ACTIVE_SERVICE" in os.environ:
             start_services(os.environ["SCHISM_ACTIVE_SERVICE"].strip())
