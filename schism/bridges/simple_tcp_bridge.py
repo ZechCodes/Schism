@@ -43,13 +43,14 @@ async def connect(host: str, port: int) -> tuple[StreamReader, StreamWriter]:
 
 async def read[TResponse: (dict[str, Any], RequestPayload)](reader: StreamReader) -> TResponse:
     length_bytes = await reader.read(4)
+    signature = await reader.read(64)
+
     length = int.from_bytes(length_bytes)
     payload = await reader.read(length)
-    signature, data = payload[:64], payload[64:]
-    if signature != _generate_signature(data):
+    if signature != _generate_signature(payload):
         raise ValueError(f"Received an invalid signature")
 
-    return pickle.loads(data)
+    return pickle.loads(payload)
 
 
 async def send(payload: Any, writer: StreamWriter):
