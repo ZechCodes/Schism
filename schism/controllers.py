@@ -23,7 +23,7 @@ def _validate_entry_point_name(name: str):
 
 
 class SchismController(ABC):
-    def __init__(self):
+    def __init__(self, service: str = ""):
         self._service_configs: "Optional[dict[str, configs.ServiceConfig]]" = Optional.Nothing()
         self._active_services: Optional[ServicesConfigMapping] = Optional.Nothing()
         self._remote_services: Optional[ServicesConfigMapping] = Optional.Nothing()
