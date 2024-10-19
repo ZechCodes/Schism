@@ -143,7 +143,7 @@ class SimpleTCPServer(BridgeServer):
 
 
 class SimpleTCPBridge(BaseBridge):
-    SECRET_KEY = os.environ.get("SCHISM_SECRET_KEY", "").encode()
+    SECRET_KEY = os.environ.get("SCHISM_TCP_BRIDGE_SECRET", "").encode()
 
     @classmethod
     def create_client(cls, service_type: "Type[Service]", config: SimpleTCPConfig):
