@@ -2,7 +2,6 @@ import asyncio
 import hashlib
 import os
 import pickle
-import traceback
 from typing import Type, TYPE_CHECKING
 
 from bevy import get_repository
