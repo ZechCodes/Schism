@@ -1,3 +1,4 @@
+"""This module is intended solely to enable the schism command script that is configured in pyproject.toml."""
 import os
 import sys
 
