@@ -1,3 +1,35 @@
+"""Schism controllers manage the state and life cycle of the application, storing the list of configured services, active & remote
+services, entry points for active services, and tasks that need to be launched at runtime.
+
+Schism app's have two basic life cycles: service and application.
+- Service life cycle: Create distributed controller, bootstrap service types by instantiating their types, set up the
+service entry points by loading them into the "schism.run" module namespace, and finally launching the service tasks in
+the event loop.
+- Application life cycle: Import the application module & access the application callback, create the distributed
+controller with the application callback, and finally launching by running the application callback as a launch task in
+the event loop.
+
+Included are the MonolithicController and DistributedController.
+
+The MonolithicController is intended to run the application entirely standalone, in a singular process. To ensure
+everything runs consistent with the life cycle of the DistributedController, it is important to launch your application
+using the "start_app" function. Here's a stripped down example:
+
+    from schism import start_app
+    ...
+    async def main():
+        ...
+
+    if __name__ == '__main__':
+        start_app(main())
+
+This starts the "main" app function in an event loop that exits when the "main" function returns, and it handles
+bootstrapping all service types so they start in the correct order following the correct life cycle.
+
+The DistributedController handles bootstrapping standalone services and running the application callback as its own
+process that is autowired to access distributed services. This is typically done by running services and applications
+using the "schism run" CLI."""
+
 import asyncio
 from abc import ABC, abstractmethod
 from typing import Any, Generator, Type, Callable, Awaitable
