@@ -131,7 +131,7 @@ class SchismController(ABC):
 
     @inject
     def _load_services_configs(
-            self, config: "configs.ApplicationConfig" = dependency()
+       self, config: "configs.ApplicationConfig" = dependency()
     ) -> "Generator[tuple[str, configs.ServiceConfig], None, None]":
         for service_config in config.services:
             yield service_config.service, service_config
@@ -234,10 +234,7 @@ class DistributedController(SchismController):
 
     def _launch_server(self, service_config: configs.ServiceConfig):
         bridge = service_config.get_bridge_type()
-        self._servers[service_config.service] = bridge.create_server(
-            service_config.get_service_type(),
-            bridge.config_factory(service_config.bridge),
-        )
+        self._servers[service_config.service] = bridge.create_server(bridge.config_factory(service_config.bridge))
 
 
 def get_controller() -> SchismController:

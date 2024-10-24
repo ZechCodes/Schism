@@ -1,4 +1,5 @@
 import schism.controllers
+from schism.bridges.base import BridgeClientFacade
 
 
 class Service:
@@ -12,6 +13,10 @@ class Service:
 
         # Inject a bridge client to remotely access a service that doesn't exist in the running process
         else:
-            config = controller.get_service_config(cls)
-            bridge = config.get_bridge_type()
-            return bridge.create_client(cls, bridge.config_factory(config.bridge))
+            service_config = controller.get_service_config(cls)
+            bridge = service_config.get_bridge_type()
+            return BridgeClientFacade(
+                bridge_type=bridge,
+                service_type=cls,
+                config=bridge.config_factory(service_config.bridge),
+            )

@@ -33,13 +33,14 @@ import hashlib
 import os
 import pickle
 from asyncio import StreamReader, StreamWriter
-from functools import lru_cache, partial
+from functools import lru_cache
 from typing import Any, Type, TYPE_CHECKING
 
 from bevy import get_repository
-from pydantic import BaseModel
+from tramp.results import Result
 
-from .base import BaseBridge, BridgeClient, BridgeServer, RemoteError
+from .base import BaseBridge, BridgeClient, BridgeServer, RemoteError, MethodCallPayload, ReturnPayload, \
+    ExceptionPayload, ResultPayload
 from .bridge_helpers import ResponseBuilder
 from schism.configs import SchismConfigModel
 from schism.controllers import get_controller
@@ -50,12 +51,6 @@ if TYPE_CHECKING:
 
 def _generate_signature(data: bytes) -> bytes:
     return hashlib.sha256(data + SimpleTCPBridge.SECRET_KEY).hexdigest().encode()
-
-
-class RequestPayload(BaseModel):
-    method: str
-    args: tuple
-    kwargs: dict
 
 
 class SimpleTCPConfig(SchismConfigModel, lax=True):
@@ -70,7 +65,7 @@ async def connect(host: str, port: int) -> tuple[StreamReader, StreamWriter]:
         raise RuntimeError(f"Unable to connect to service on {host}:{port}") from e
 
 
-async def read[TResponse: (dict[str, Any], RequestPayload)](reader: StreamReader) -> TResponse:
+async def read(reader: StreamReader) -> ResultPayload | MethodCallPayload:
     """When reading from a TCP connection first read 4 bytes to get the content length. Next read the 64 byte signature.
     Next read the content and validate the signature matches. If it does then it is safe to load the payload pickle.
     """
@@ -85,7 +80,7 @@ async def read[TResponse: (dict[str, Any], RequestPayload)](reader: StreamReader
     return pickle.loads(payload)
 
 
-async def send(data: Any, writer: StreamWriter):
+async def send(data: ResultPayload | MethodCallPayload, writer: StreamWriter):
     """When writing to a TCP connection first write the 4 byte content length of the pickled data, then the 64 byte
     signature, and finally write the pickle."""
     payload = pickle.dumps(data)
@@ -117,31 +112,25 @@ class SimpleTCPClient(BridgeClient):
             ).split(":")[1]
         )
 
-    def __getattr__(self, item):
-        return partial(self.__make_request, item)
-
-    async def __make_request(self, method, *args, **kwargs):
+    async def call_async_method(self, payload: MethodCallPayload):
         reader, writer = await connect(self.host, self.port)
         with contextlib.closing(writer):
-            await send(
-                RequestPayload(method=method, args=args, kwargs=kwargs),
-                writer,
-            )
+            await send(payload, writer)
             match await read(reader):
-                case {"status": "error", "data": data}:
-                    raise data["error"] from RemoteError(
+                case {"error": error, "traceback": traceback}:
+                    raise error from RemoteError(
                         f"\n"
-                        f"{''.join(data['traceback'])}\n"
+                        f"{''.join(traceback)}\n"
                         f"---------------------------------------------\n"
                         f"The above stacktrace is from a remote service\n"
                         f"---------------------------------------------"
                     )
 
-                case {"data": data}:
-                    return data
+                case {"result": result}:
+                    return result
 
-                case _:
-                    raise RuntimeError("Impossible State, server response must be malformed.")
+                case payload:
+                    raise RuntimeError(f"Impossible State, server response must be malformed: {payload!r}")
 
 
 class SimpleTCPServer(BridgeServer):
@@ -166,26 +155,26 @@ class SimpleTCPServer(BridgeServer):
     async def _handle_request(self, reader, writer):
         with contextlib.closing(writer):
             with ResponseBuilder() as result:
-                request: RequestPayload = await read(reader)
+                request: MethodCallPayload = await read(reader)
 
-                service = get_repository().get(self.service)
-                method = getattr(service, request.method)
+                service = get_repository().get(request["service"])
+                method = getattr(service, request["method"])
 
-                result.set(await method(*request.args, **request.kwargs))
+                result.set(await method(*request["args"], **request["kwargs"]))
 
-            await send(result.to_dict(), writer)
+            await send(result.data, writer)
 
 
 class SimpleTCPBridge(BaseBridge):
     SECRET_KEY = os.environ.get("SCHISM_TCP_BRIDGE_SECRET", "").encode()
 
     @classmethod
-    def create_client(cls, service_type: "Type[Service]", config: SimpleTCPConfig):
-        return SimpleTCPClient(service_type, config)
+    def create_client(cls, config: SimpleTCPConfig):
+        return SimpleTCPClient(config)
 
     @classmethod
-    def create_server(cls, service_type: "Type[Service]", config: SimpleTCPConfig):
-        server = SimpleTCPServer(service_type, config)
+    def create_server(cls, config: SimpleTCPConfig):
+        server = SimpleTCPServer(config)
         get_controller().add_launch_task(server.launch())
         return server
 
