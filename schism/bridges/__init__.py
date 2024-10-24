@@ -1,1 +1,1 @@
-from .base import BaseBridge, BridgeClient, BridgeServer
+from .bases import BaseBridge, BridgeClient, BridgeServer

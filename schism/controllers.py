@@ -39,6 +39,7 @@ from tramp.optionals import Optional
 
 import schism.services as services
 import schism.configs as configs
+from schism.middlewares import MiddlewareStack
 
 type ServicesConfigMapping = dict[Type[services.Service], configs.ServiceConfig]
 
@@ -223,10 +224,10 @@ class DistributedController(SchismController):
     def bootstrap(self):
         """Entry point processes need to bootstrap services that are active."""
         if not next(self.filter_services(lambda s: s.name == self._active_service_name), False):
-                raise RuntimeError(
-                    f"Unknown service: {self._active_service_name}\n\nAll services must be configured in the "
-                    f"schism.config file."
-                )
+            raise RuntimeError(
+                f"Unknown service: {self._active_service_name}\n\nAll services must be configured in the "
+                f"schism.config file."
+            )
 
         for service_config in self.active_services.values():
             bevy.get_repository().get(service_config.get_service_type())  # Create the service instance
@@ -234,7 +235,10 @@ class DistributedController(SchismController):
 
     def _launch_server(self, service_config: configs.ServiceConfig):
         bridge = service_config.get_bridge_type()
-        self._servers[service_config.service] = bridge.create_server(bridge.config_factory(service_config.bridge))
+        self._servers[service_config.service] = bridge.create_server(
+            bridge.config_factory(service_config.bridge),
+            MiddlewareStack(service_config.get_bridge_middleware())
+        )
 
 
 def get_controller() -> SchismController:

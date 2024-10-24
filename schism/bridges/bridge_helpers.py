@@ -1,6 +1,6 @@
 import traceback
 
-from schism.bridges.base import ReturnPayload, ExceptionPayload, ResultPayload
+import schism.bridges.bases as base
 
 
 class ResponseBuilder:
@@ -11,14 +11,14 @@ class ResponseBuilder:
     capture all exceptions raised by a service and propagate them to the client so that the calling code can handle
     those exceptions as normal."""
     def __init__(self):
-        self.data: ResultPayload = ReturnPayload(result=None)
+        self.payload: base.ResultPayload = base.ReturnPayload(result=None)
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:
-            self.data = ExceptionPayload(
+            self.payload = base.ExceptionPayload(
                 error=exc_val,
                 traceback=traceback.format_exception(exc_type, exc_val, exc_tb),
             )
@@ -27,4 +27,4 @@ class ResponseBuilder:
 
     def set(self, data):
         """Set the response payload. This payload is overwritten by any exceptions that are raised."""
-        self.data = ReturnPayload(result=data)
+        self.payload = base.ReturnPayload(result=data)

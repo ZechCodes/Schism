@@ -6,3 +6,5 @@ services:
     bridge:
       type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
       serve_on: 0.0.0.0:1234
+      middleware:
+        - type: greetings:MiddlewareExample

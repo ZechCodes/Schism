@@ -39,11 +39,12 @@ from typing import Any, Type, TYPE_CHECKING
 from bevy import get_repository
 from tramp.results import Result
 
-from .base import BaseBridge, BridgeClient, BridgeServer, RemoteError, MethodCallPayload, ReturnPayload, \
+from .bases import BaseBridge, BridgeClient, BridgeServer, RemoteError, MethodCallPayload, ReturnPayload, \
     ExceptionPayload, ResultPayload
 from .bridge_helpers import ResponseBuilder
 from schism.configs import SchismConfigModel
 from schism.controllers import get_controller
+from ..middlewares import MiddlewareStack
 
 if TYPE_CHECKING:
     from schism.services import Service
@@ -116,21 +117,7 @@ class SimpleTCPClient(BridgeClient):
         reader, writer = await connect(self.host, self.port)
         with contextlib.closing(writer):
             await send(payload, writer)
-            match await read(reader):
-                case {"error": error, "traceback": traceback}:
-                    raise error from RemoteError(
-                        f"\n"
-                        f"{''.join(traceback)}\n"
-                        f"---------------------------------------------\n"
-                        f"The above stacktrace is from a remote service\n"
-                        f"---------------------------------------------"
-                    )
-
-                case {"result": result}:
-                    return result
-
-                case payload:
-                    raise RuntimeError(f"Impossible State, server response must be malformed: {payload!r}")
+            return await read(reader)
 
 
 class SimpleTCPServer(BridgeServer):
@@ -154,27 +141,21 @@ class SimpleTCPServer(BridgeServer):
 
     async def _handle_request(self, reader, writer):
         with contextlib.closing(writer):
-            with ResponseBuilder() as result:
-                request: MethodCallPayload = await read(reader)
-
-                service = get_repository().get(request["service"])
-                method = getattr(service, request["method"])
-
-                result.set(await method(*request["args"], **request["kwargs"]))
-
-            await send(result.data, writer)
+            call_payload: MethodCallPayload = await read(reader)
+            result = await self.call_service(call_payload)
+            await send(result, writer)
 
 
 class SimpleTCPBridge(BaseBridge):
     SECRET_KEY = os.environ.get("SCHISM_TCP_BRIDGE_SECRET", "").encode()
 
     @classmethod
-    def create_client(cls, config: SimpleTCPConfig):
-        return SimpleTCPClient(config)
+    def create_client(cls, config: SimpleTCPConfig, middleware_stack: MiddlewareStack) -> SimpleTCPClient:
+        return SimpleTCPClient(config, middleware_stack)
 
     @classmethod
-    def create_server(cls, config: SimpleTCPConfig):
-        server = SimpleTCPServer(config)
+    def create_server(cls, config: SimpleTCPConfig, middleware_stack: MiddlewareStack) -> SimpleTCPServer:
+        server = SimpleTCPServer(config, middleware_stack)
         get_controller().add_launch_task(server.launch())
         return server
 

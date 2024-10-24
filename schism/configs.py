@@ -2,16 +2,20 @@ import sys
 import pathlib
 from functools import lru_cache
 from importlib import import_module
-from typing import Type, TYPE_CHECKING, Any, TypedDict
+from typing import Type, TYPE_CHECKING, Any
 
 from nubby import ConfigModel
 from pydantic import BaseModel
 
+from schism.middlewares import Middleware
+
+type StringOrSettings = str | dict[str, Any]
 
 MAIN_MODULE_NAME = pathlib.Path(getattr(sys.modules["__main__"], "__file__", "")).stem or None
 
 if TYPE_CHECKING:
     import schism.bridges as bridges
+    import schism.middlewares as middlewares
     import schism.services as services
 
 
@@ -43,11 +47,11 @@ class ServiceConfig(SchismConfigModel, lax=True):
     bridge types "config_factory" class method to generate teh config that is passed to the bridge client and server."""
     name: str
     service: str
-    bridge: str | dict[str, Any]
+    bridge: StringOrSettings
 
     def get_bridge_type(self) -> "Type[bridges.BaseBridge]":
         """Finds the module for the bridge type and gets the bridge type from the module."""
-        return self._load_object(self._get_bridge_locator())
+        return self._load_object(self._get_locator(self.bridge))
 
     def get_service_type(self) -> "Type[services.Service]":
         """Finds the module for the service type and gets the service type from the module."""
@@ -57,16 +61,37 @@ class ServiceConfig(SchismConfigModel, lax=True):
         """Passes the bridge config to the bridge type's config factory method and passes back its return."""
         return self.get_bridge_type().config_factory(self.bridge)
 
-    def _get_bridge_locator(self) -> str:
+    def get_bridge_middleware(self) -> dict[Type[Middleware], dict[str, Any]]:
+        """Finds the module for the middleware type and gets the middleware type from the module."""
         match self.bridge:
-            case str() as bridge:
-                return bridge
-
-            case {"type": str() as bridge}:
-                return bridge
+            case {"middleware": list() as middleware}:
+                return dict(self._generate_middleware(middleware))
 
             case _:
-                raise ValueError(f"Invalid bridge configuration for service {self.name}")
+                return {}
+
+    def _generate_middleware(self, middleware: list[StringOrSettings]):
+        for middleware_setting in middleware:
+            match middleware_setting:
+                case str() as locator:
+                    yield self._load_object(locator), {}
+
+                case {"type": locator, **settings}:
+                    yield self._load_object(locator), settings
+
+                case _:
+                    raise ValueError(f"Invalid configuration for service {self.name}: {middleware!r}")
+
+    def _get_locator(self, string_or_settings: StringOrSettings) -> str:
+        match string_or_settings:
+            case str() as locator:
+                return locator
+
+            case {"type": str() as locator}:
+                return locator
+
+            case _:
+                raise ValueError(f"Invalid configuration for service {self.name}: {string_or_settings!r}")
 
     @staticmethod
     @lru_cache

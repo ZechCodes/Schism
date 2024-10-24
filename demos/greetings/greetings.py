@@ -14,9 +14,33 @@ changes made in the runtime.
 """
 from bevy import inject, dependency
 from schism import Service, start_app
-
+from schism.bridges.bases import MethodCallPayload, ResultPayload
+from schism.middlewares import Middleware
 
 remote = True
+
+
+class MiddlewareExample(Middleware):
+    async def filter_client_call(self, payload: MethodCallPayload) -> MethodCallPayload:
+        print("[MIDDLEWARE] Client call filter")
+        return payload
+
+    async def filter_client_result(self, payload: ResultPayload) -> ResultPayload:
+        print(f"[MIDDLEWARE] Client result filter")
+        match payload:
+            case {"result": result}:
+                return {"result": f"Received From Service: {result!r}"}
+
+            case _:
+                return payload
+
+    async def filter_server_call(self, payload: MethodCallPayload) -> MethodCallPayload:
+        print("[MIDDLEWARE] Server call filter")
+        return payload
+
+    async def filter_server_result(self, payload: MethodCallPayload) -> MethodCallPayload:
+        print("[MIDDLEWARE] Server result filter")
+        return payload
 
 
 class GreetingService(Service):
