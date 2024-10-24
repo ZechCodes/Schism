@@ -15,10 +15,6 @@ if TYPE_CHECKING:
     import schism.services as services
 
 
-class BridgeSettings(TypedDict):
-    type: str
-
-
 class SchismConfigModel(BaseModel, ConfigModel, lax=True):
     """Base model config that implements the correct interface for serialization."""
     def to_dict(self):
@@ -47,7 +43,7 @@ class ServiceConfig(SchismConfigModel, lax=True):
     bridge types "config_factory" class method to generate teh config that is passed to the bridge client and server."""
     name: str
     service: str
-    bridge: str | BridgeSettings
+    bridge: str | dict[str, Any]
 
     def get_bridge_type(self) -> "Type[bridges.BaseBridge]":
         """Finds the module for the bridge type and gets the bridge type from the module."""
