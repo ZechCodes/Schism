@@ -26,6 +26,17 @@ It is also possible to configure the client separately:
           type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
           serve_on: 0.0.0.0:1234
           client: example.com:4321
+
+
+The Simple TCP Bridge uses a custom protocol on top of TCP. The version 0 protocol uses the following structure:
+
+Usage          | Size (Bytes)   | Data Type
+---------------|----------------|--------------------
+Version        |              2 | int (big endian)
+Content Length |              4 | int (big endian)
+Signature      |             64 | bytes (sha256 hash)
+Content        |      Arbitrary | pickle
+---------------|----------------|--------------------
 """
 import asyncio
 import contextlib
