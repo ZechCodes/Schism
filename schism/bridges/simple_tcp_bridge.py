@@ -96,7 +96,7 @@ async def read(reader: StreamReader) -> ResultPayload | MethodCallPayload:
     length_bytes = await reader.read(4)
     signature = await reader.read(64)
 
-    length = int.from_bytes(length_bytes)
+    length = int.from_bytes(length_bytes, byteorder="big")
     payload = await reader.read(length)
     if signature != _generate_signature(payload):
         raise ValueError(f"Received an invalid signature")
@@ -109,7 +109,7 @@ async def send(data: ResultPayload | MethodCallPayload, writer: StreamWriter):
     pickled data, then the 64 byte signature, and finally write the pickle."""
     payload = pickle.dumps(data)
     writer.write(SIMPLE_TCP_VERSION_SUPPORTED.to_bytes(2, byteorder="big"))
-    writer.write(len(payload).to_bytes(4))
+    writer.write(len(payload).to_bytes(4, byteorder="big"))
     writer.write(_generate_signature(payload))
     writer.write(payload)
     await writer.drain()
