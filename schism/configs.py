@@ -15,7 +15,6 @@ MAIN_MODULE_NAME = pathlib.Path(getattr(sys.modules["__main__"], "__file__", "")
 
 if TYPE_CHECKING:
     import schism.bridges as bridges
-    import schism.middlewares as middlewares
     import schism.services as services
 
 
