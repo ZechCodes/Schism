@@ -170,8 +170,8 @@ class SimpleTCP(BaseBridge):
     SECRET_KEY = os.environ.get("SCHISM_TCP_BRIDGE_SECRET", "").encode()
 
     @classmethod
-    def create_client(cls, config: SimpleTCPConfig, middleware_stack: MiddlewareStackBuilder) -> SimpleTCPClient:
-        return SimpleTCPClient(config, middleware_stack)
+    def create_client(cls, config: SimpleTCPConfig) -> SimpleTCPClient:
+        return SimpleTCPClient(config)
 
     @classmethod
     def create_server(cls, config: SimpleTCPConfig, middleware_stack: MiddlewareStackBuilder) -> SimpleTCPServer:

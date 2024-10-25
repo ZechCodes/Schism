@@ -69,9 +69,8 @@ class BridgeClient(ABC):
 
     It is important that bridge clients raise exceptions raised on the service server so that they can be properly
     propagated and handled by the client code."""
-    def __init__(self, config: Any, middleware_stack: "middleware.MiddlewareStackBuilder"):
+    def __init__(self, config: Any):
         self.config = config
-        self.middleware = middleware_stack
 
     @abstractmethod
     async def call_async_method(self, payload: MethodCallPayload) -> ResultPayload:
@@ -113,7 +112,7 @@ class BaseBridge(ABC):
     """Bridges provide methods for creating the corresponding configs, clients, and servers."""
     @classmethod
     @abstractmethod
-    def create_client(cls, config: Any, middleware_stack: "middleware.MiddlewareStackBuilder") -> BridgeClient:
+    def create_client(cls, config: Any) -> BridgeClient:
         ...
 
     @classmethod
@@ -134,7 +133,7 @@ class BridgeClientFacade:
         config: Any,
         middleware_stack: "middleware.MiddlewareStackBuilder"
     ):
-        self.client = bridge_type.create_client(config, middleware_stack)
+        self.client = bridge_type.create_client(config)
         self.service_type = service_type
         self.middleware = middleware_stack
 
