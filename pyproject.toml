@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "schism"
-version = "0.1.2"
+version = "0.1.3"
 description = "Schism is an autowiring library that makes modularity simple in monolithes and simplifies code sharing in microservices."
 authors = ["ZechCodes <hi@zech.codes>"]
 license = "MIT"
