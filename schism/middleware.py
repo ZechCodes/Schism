@@ -38,7 +38,7 @@ class Middleware:
         raise NotImplementedError
 
 
-class MiddlewareStackRuntime:
+class MiddlewareStack:
     def __init__(self, middleware: list[Middleware]):
         self.middleware = middleware
 
@@ -50,12 +50,12 @@ class MiddlewareStackRuntime:
         return payload
 
 
-class MiddlewareStack:
+class MiddlewareStackBuilder:
     def __init__(self, middleware: dict[Type[Middleware], dict[str, Any]]):
         self.middleware = middleware
 
-    def get_middleware(self, *events: FilterEvent) -> MiddlewareStackRuntime:
-        return MiddlewareStackRuntime(
+    def get_middleware(self, *events: FilterEvent) -> MiddlewareStack:
+        return MiddlewareStack(
             [
                 middleware_type(**settings)
                 for middleware_type, settings in self.middleware.items()

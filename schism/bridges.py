@@ -69,7 +69,7 @@ class BridgeClient(ABC):
 
     It is important that bridge clients raise exceptions raised on the service server so that they can be properly
     propagated and handled by the client code."""
-    def __init__(self, config: Any, middleware_stack: "middleware.MiddlewareStack"):
+    def __init__(self, config: Any, middleware_stack: "middleware.MiddlewareStackBuilder"):
         self.config = config
         self.middleware = middleware_stack
 
@@ -83,7 +83,7 @@ class BridgeServer(ABC):
 
     It is important that bridge servers capture exceptions raised while calling the service and pass them to the client
     so that they can be properly propagated and handled by the client code."""
-    def __init__(self, config: Any, middleware_stack: "middleware.MiddlewareStack"):
+    def __init__(self, config: Any, middleware_stack: "middleware.MiddlewareStackBuilder"):
         self.config = config
         self.middleware = middleware_stack
 
@@ -113,12 +113,12 @@ class BaseBridge(ABC):
     """Bridges provide methods for creating the corresponding configs, clients, and servers."""
     @classmethod
     @abstractmethod
-    def create_client(cls, config: Any, middleware_stack: "middleware.MiddlewareStack") -> BridgeClient:
+    def create_client(cls, config: Any, middleware_stack: "middleware.MiddlewareStackBuilder") -> BridgeClient:
         ...
 
     @classmethod
     @abstractmethod
-    def create_server(cls, config: Any, middleware_stack: "middleware.MiddlewareStack") -> BridgeServer:
+    def create_server(cls, config: Any, middleware_stack: "middleware.MiddlewareStackBuilder") -> BridgeServer:
         ...
 
     @classmethod
@@ -132,7 +132,7 @@ class BridgeClientFacade:
         bridge_type: Type[BaseBridge],
         service_type: "Type[Service]",
         config: Any,
-        middleware_stack: "middleware.MiddlewareStack"
+        middleware_stack: "middleware.MiddlewareStackBuilder"
     ):
         self.client = bridge_type.create_client(config, middleware_stack)
         self.service_type = service_type

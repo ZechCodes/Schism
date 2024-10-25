@@ -49,7 +49,7 @@ from functools import lru_cache
 from schism.bridges import BaseBridge, BridgeClient, BridgeServer, MethodCallPayload, ResultPayload
 from schism.configs import SchismConfigModel
 from schism.controllers import get_controller
-from schism.middleware import MiddlewareStack
+from schism.middleware import MiddlewareStackBuilder
 
 
 SIMPLE_TCP_VERSION_SUPPORTED = 0
@@ -170,11 +170,11 @@ class SimpleTCP(BaseBridge):
     SECRET_KEY = os.environ.get("SCHISM_TCP_BRIDGE_SECRET", "").encode()
 
     @classmethod
-    def create_client(cls, config: SimpleTCPConfig, middleware_stack: MiddlewareStack) -> SimpleTCPClient:
+    def create_client(cls, config: SimpleTCPConfig, middleware_stack: MiddlewareStackBuilder) -> SimpleTCPClient:
         return SimpleTCPClient(config, middleware_stack)
 
     @classmethod
-    def create_server(cls, config: SimpleTCPConfig, middleware_stack: MiddlewareStack) -> SimpleTCPServer:
+    def create_server(cls, config: SimpleTCPConfig, middleware_stack: MiddlewareStackBuilder) -> SimpleTCPServer:
         server = SimpleTCPServer(config, middleware_stack)
         get_controller().add_launch_task(server.launch())
         return server
