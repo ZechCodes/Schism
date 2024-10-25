@@ -50,6 +50,9 @@ if TYPE_CHECKING:
     from schism.services import Service
 
 
+SIMPLE_TCP_VERSION_SUPPORTED = 0
+
+
 def _generate_signature(data: bytes) -> bytes:
     return hashlib.sha256(data + SimpleTCPBridge.SECRET_KEY).hexdigest().encode()
 
@@ -66,10 +69,24 @@ async def connect(host: str, port: int) -> tuple[StreamReader, StreamWriter]:
         raise RuntimeError(f"Unable to connect to service on {host}:{port}") from e
 
 
+async def read_version(reader: StreamReader) -> int:
+    """Reads 2 bytes and converts them to a big endian int."""
+    version = await reader.read(2)
+    return int.from_bytes(version, byteorder="big")
+
+
 async def read(reader: StreamReader) -> ResultPayload | MethodCallPayload:
-    """When reading from a TCP connection first read 4 bytes to get the content length. Next read the 64 byte signature.
-    Next read the content and validate the signature matches. If it does then it is safe to load the payload pickle.
+    """When reading from a TCP connection first read 2 bytes to get the version, then 4 bytes to get the content length.
+    Next read the 64 byte signature. Next read the content and validate the signature matches. If it does then it is
+    safe to load the payload pickle.
     """
+    version = await read_version(reader)
+    if version != SIMPLE_TCP_VERSION_SUPPORTED:
+        raise RuntimeError(
+            f"Only SimpleTCP protocol version {SIMPLE_TCP_VERSION_SUPPORTED} is supported, detected "
+            f"version {version}."
+        )
+
     length_bytes = await reader.read(4)
     signature = await reader.read(64)
 
@@ -82,9 +99,10 @@ async def read(reader: StreamReader) -> ResultPayload | MethodCallPayload:
 
 
 async def send(data: ResultPayload | MethodCallPayload, writer: StreamWriter):
-    """When writing to a TCP connection first write the 4 byte content length of the pickled data, then the 64 byte
-    signature, and finally write the pickle."""
+    """When writing to a TCP connection first write the 2 byte protocol version then the 4 byte content length of the
+    pickled data, then the 64 byte signature, and finally write the pickle."""
     payload = pickle.dumps(data)
+    writer.write(SIMPLE_TCP_VERSION_SUPPORTED.to_bytes(2, byteorder="big"))
     writer.write(len(payload).to_bytes(4))
     writer.write(_generate_signature(payload))
     writer.write(payload)
