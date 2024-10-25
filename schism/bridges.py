@@ -1,3 +1,28 @@
+"""Bridges are how Schism services communicate with each other in a distributed context. They are never used when the
+application is running in a monolithic mode. They are made of three parts:
+- Bridge class: referenced in the schism.config, used to create instances of the bridge server and bridge client
+- Server class: stands in front of the service class and accepts method call requests from clients
+- Client class: used in place of the service class to proxy method calls as requests to the server
+
+The client and server should be "dumb" in that they just pass payloads of dictionaries back and forth. There should be
+no evaluation of how the results are handled. The active Schism controller handles everything including determining
+where exceptions should be handled.
+
+The bridge class should provide three different class methods:
+- create_client: should return an instance of the bridge client
+- create_server: should return an instance of the bridge server and register any launch tasks or endpoints that are
+needed to make it accessible
+- config_factory: should process any settings that can be passed to the bridge from a service config in the
+schism.config file, this return in passed through to the create_client and create_server methods
+
+The client class only has to implement a single method call_async_method which should pass the method call payload to
+the bridge server. It should then return the result payload that the server responds with.
+
+The server class's implementation is much less strict. It only needs to pass the method call payload it receives to the
+call_service method of the server instance and then pass that method's return payload back to the client.
+
+Both the client and server classes are instantiated with the bridge config and a middleware stack builder. The
+middleware stack builder """
 import traceback
 from abc import ABC, abstractmethod
 from functools import partial
@@ -64,24 +89,20 @@ type ResultPayload = ReturnPayload | ExceptionPayload
 
 
 class BridgeClient(ABC):
-    """Bridge clients are facades for service types. These client facades are injected in place of the services when
-    using the DistributedController.
-
-    It is important that bridge clients raise exceptions raised on the service server so that they can be properly
-    propagated and handled by the client code."""
+    """Bridge clients proxy method calls from the service facade to the service server."""
     def __init__(self, config: Any):
         self.config = config
 
     @abstractmethod
     async def call_async_method(self, payload: MethodCallPayload) -> ResultPayload:
+        """Should pass the method call payload up to the running bridge server and return the result payload it responds
+        with."""
         ...
 
 
-    """Bridge servers provide a publicly accessible API for calling a service type.
-
-    It is important that bridge servers capture exceptions raised while calling the service and pass them to the client
-    so that they can be properly propagated and handled by the client code."""
 class BridgeServer:
+    """Bridge servers take method call payloads and propagate them to the service itself, responding to the client with
+    the result payload return from call_service."""
     def __init__(self, config: Any, middleware_stack: "middleware.MiddlewareStackBuilder"):
         self.config = config
         self.middleware = middleware_stack
@@ -122,6 +143,9 @@ class BaseBridge(ABC):
 
 
 class BridgeClientFacade:
+    """The client facade is injected in place of a service and passes off method calls to the bridge client. The facade
+    handles propagation of exceptions from the bridge server to the client code. The facade also handles running
+    middleware on the client side."""
     def __init__(
         self,
         bridge_type: Type[BaseBridge],
