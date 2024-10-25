@@ -50,10 +50,10 @@ from typing import TYPE_CHECKING
 from .bases import BaseBridge, BridgeClient, BridgeServer, MethodCallPayload, ResultPayload
 from schism.configs import SchismConfigModel
 from schism.controllers import get_controller
-from ..middlewares import MiddlewareStack
 
 if TYPE_CHECKING:
     from schism.services import Service
+from schism.middlewares import MiddlewareStack
 
 
 SIMPLE_TCP_VERSION_SUPPORTED = 0
