@@ -54,7 +54,7 @@ services:
   - name: greeting
     service: greetings:GreetingService
     bridge:
-      type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
+      type: schism.ext.bridges.simple_tcp:SimpleTCP
       serve_on: localhost:1234
 ```
 
