@@ -45,14 +45,10 @@ import os
 import pickle
 from asyncio import StreamReader, StreamWriter
 from functools import lru_cache
-from typing import TYPE_CHECKING
 
 from .bases import BaseBridge, BridgeClient, BridgeServer, MethodCallPayload, ResultPayload
 from schism.configs import SchismConfigModel
 from schism.controllers import get_controller
-
-if TYPE_CHECKING:
-    from schism.services import Service
 from schism.middlewares import MiddlewareStack
 
 
