@@ -1,7 +1,7 @@
 from bevy import inject, dependency
 
 from conftest import ServiceA, Bridge
-from schism.bridges.bases import BridgeClientFacade
+from schism.bridges import BridgeClientFacade
 from schism.controllers import get_controller
 
 

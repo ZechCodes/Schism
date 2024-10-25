@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Awaitable, ClassVar, Type, Any
 
-from schism.bridges.bases import MethodCallPayload, ResultPayload, ReturnPayload
+from schism.bridges import MethodCallPayload, ResultPayload, ReturnPayload
 
 
 class FilterEvent(Enum):

@@ -46,7 +46,7 @@ import pickle
 from asyncio import StreamReader, StreamWriter
 from functools import lru_cache
 
-from schism.bridges.bases import BaseBridge, BridgeClient, BridgeServer, MethodCallPayload, ResultPayload
+from schism.bridges import BaseBridge, BridgeClient, BridgeServer, MethodCallPayload, ResultPayload
 from schism.configs import SchismConfigModel
 from schism.controllers import get_controller
 from schism.middlewares import MiddlewareStack

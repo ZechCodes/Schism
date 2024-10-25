@@ -1,5 +1,5 @@
 import schism.controllers
-from schism.bridges.bases import BridgeClientFacade
+from schism.bridges import BridgeClientFacade
 from schism.middlewares import MiddlewareStack
 
 

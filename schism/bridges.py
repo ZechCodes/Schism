@@ -1,14 +1,41 @@
+import traceback
 from abc import ABC, abstractmethod
 from functools import partial
 from typing import Type, TYPE_CHECKING, Any, TypedDict
 
 from bevy import get_repository
 
-import schism.bridges.bridge_helpers as helpers
 import schism.middlewares as middleware
 
 if TYPE_CHECKING:
     from schism.services import Service
+
+
+class ResponseBuilder:
+    """A helper context that captures all exceptions that are raised on the server while attempting to respond to a
+    client request.
+
+    In a standard single process application, errors raised by a method are handled by the caller. So it is necessary to
+    capture all exceptions raised by a service and propagate them to the client so that the calling code can handle
+    those exceptions as normal."""
+    def __init__(self):
+        self.payload: ResultPayload = ReturnPayload(result=None)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is not None:
+            self.payload = ExceptionPayload(
+                error=exc_val,
+                traceback=traceback.format_exception(exc_type, exc_val, exc_tb),
+            )
+
+        return True
+
+    def set(self, data):
+        """Set the response payload. This payload is overwritten by any exceptions that are raised."""
+        self.payload = ReturnPayload(result=data)
 
 
 class RemoteError(Exception):
@@ -68,7 +95,7 @@ class BridgeServer(ABC):
         middleware_stack = self.middleware.get_middleware(
             middleware.FilterEvent.SERVER_CALL, middleware.FilterEvent.SERVER_RESULT
         )
-        with helpers.ResponseBuilder() as result:
+        with ResponseBuilder() as result:
             filtered_payload = await middleware_stack.filter(middleware.FilterEvent.SERVER_CALL, payload)
 
             service = get_repository().get(filtered_payload["service"])
