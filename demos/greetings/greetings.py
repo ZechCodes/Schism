@@ -15,7 +15,7 @@ changes made in the runtime.
 from bevy import inject, dependency
 from schism import Service, start_app
 from schism.bridges import MethodCallPayload, ResultPayload
-from schism.middlewares import Middleware
+from schism.middleware import Middleware
 
 remote = True
 

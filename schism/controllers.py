@@ -39,7 +39,7 @@ from tramp.optionals import Optional
 
 import schism.services as services
 import schism.configs as configs
-from schism.middlewares import MiddlewareStack
+from schism.middleware import MiddlewareStack
 
 type ServicesConfigMapping = dict[Type[services.Service], configs.ServiceConfig]
 

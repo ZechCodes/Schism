@@ -1,6 +1,6 @@
 import schism.controllers
 from schism.bridges import BridgeClientFacade
-from schism.middlewares import MiddlewareStack
+from schism.middleware import MiddlewareStack
 
 
 class Service:

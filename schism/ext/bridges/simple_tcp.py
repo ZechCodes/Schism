@@ -49,7 +49,7 @@ from functools import lru_cache
 from schism.bridges import BaseBridge, BridgeClient, BridgeServer, MethodCallPayload, ResultPayload
 from schism.configs import SchismConfigModel
 from schism.controllers import get_controller
-from schism.middlewares import MiddlewareStack
+from schism.middleware import MiddlewareStack
 
 
 SIMPLE_TCP_VERSION_SUPPORTED = 0

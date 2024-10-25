@@ -5,7 +5,7 @@ from typing import Type, TYPE_CHECKING, Any, TypedDict
 
 from bevy import get_repository
 
-import schism.middlewares as middleware
+import schism.middleware as middleware
 
 if TYPE_CHECKING:
     from schism.services import Service
