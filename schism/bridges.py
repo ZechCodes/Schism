@@ -19,10 +19,10 @@ The client class only has to implement a single method call_async_method which s
 the bridge server. It should then return the result payload that the server responds with.
 
 The server class's implementation is much less strict. It only needs to pass the method call payload it receives to the
-call_service method of the server instance and then pass that method's return payload back to the client.
+call_async_method method of the server instance and then pass that method's return payload back to the client.
 
-Both the client and server classes are instantiated with the bridge config and a middleware stack builder. The
-middleware stack builder """
+The client and server classes are instantiated with the bridge config, the server class is also instantiated with a
+service facade that method call payloads can be passed to for handling."""
 import traceback
 from abc import ABC, abstractmethod
 from functools import partial
