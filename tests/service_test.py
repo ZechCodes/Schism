@@ -1,6 +1,6 @@
 from bevy import dependency, inject
 
-from schism.bridges.simple_tcp_bridge import SimpleTCPClient
+from schism.ext.bridges.simple_tcp import SimpleTCPClient
 from schism.services import Service
 
 

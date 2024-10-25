@@ -4,7 +4,7 @@ services:
   - name: greeting
     service: greetings:GreetingService
     bridge:
-      type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
+      type: schism.ext.bridges.simple_tcp:SimpleTCP
       serve_on: 0.0.0.0:1234
       middleware:
         - type: greetings:MiddlewareExample

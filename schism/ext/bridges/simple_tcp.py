@@ -14,7 +14,7 @@ Here's an example yaml config:
       - name: example
         service: example:Example
         bridge:
-          type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
+          type: schism.ext.bridges.simple_tcp:SimpleTCP
           serve_on: 0.0.0.0:1234
 
 It is also possible to configure the client separately:
@@ -23,7 +23,7 @@ It is also possible to configure the client separately:
       - name: example
         service: example:Example
         bridge:
-          type: schism.bridges.simple_tcp_bridge:SimpleTCPBridge
+          type: schism.ext.bridges.simple_tcp:SimpleTCP
           serve_on: 0.0.0.0:1234
           client: example.com:4321
 
@@ -46,7 +46,7 @@ import pickle
 from asyncio import StreamReader, StreamWriter
 from functools import lru_cache
 
-from .bases import BaseBridge, BridgeClient, BridgeServer, MethodCallPayload, ResultPayload
+from schism.bridges.bases import BaseBridge, BridgeClient, BridgeServer, MethodCallPayload, ResultPayload
 from schism.configs import SchismConfigModel
 from schism.controllers import get_controller
 from schism.middlewares import MiddlewareStack
@@ -56,7 +56,7 @@ SIMPLE_TCP_VERSION_SUPPORTED = 0
 
 
 def _generate_signature(data: bytes) -> bytes:
-    return hashlib.sha256(data + SimpleTCPBridge.SECRET_KEY).hexdigest().encode()
+    return hashlib.sha256(data + SimpleTCP.SECRET_KEY).hexdigest().encode()
 
 
 class SimpleTCPConfig(SchismConfigModel, lax=True):
@@ -166,7 +166,7 @@ class SimpleTCPServer(BridgeServer):
             await send(result, writer)
 
 
-class SimpleTCPBridge(BaseBridge):
+class SimpleTCP(BaseBridge):
     SECRET_KEY = os.environ.get("SCHISM_TCP_BRIDGE_SECRET", "").encode()
 
     @classmethod
