@@ -41,13 +41,13 @@ def simple_entry_point_runtime():
             services = [
                 {
                     "name": "service-a",
-                    "service": "conftest.ServiceA",
-                    "bridge": "conftest.Bridge",
+                    "service": "conftest:ServiceA",
+                    "bridge": "conftest:Bridge",
                 },
                 {
                     "name": "service-b",
-                    "service": "conftest.ServiceB",
-                    "bridge": "conftest.Bridge",
+                    "service": "conftest:ServiceB",
+                    "bridge": "conftest:Bridge",
                 },
             ],
         )
