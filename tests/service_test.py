@@ -1,5 +1,6 @@
 from bevy import dependency, inject
 
+from schism.bridges.bases import BridgeClientFacade
 from schism.ext.bridges.simple_tcp import SimpleTCPClient
 from schism.services import Service
 
@@ -45,8 +46,8 @@ class ServiceC(Service):
 
     @inject
     def a_is_remote(self, a: ServiceA = dependency()):
-        return isinstance(a, SimpleTCPClient)
+        return isinstance(a, BridgeClientFacade) and isinstance(a.client, SimpleTCPClient)
 
     @inject
     def b_is_remote(self, b: ServiceB = dependency()):
-        return isinstance(b, SimpleTCPClient)
+        return isinstance(b, BridgeClientFacade) and isinstance(b.client, SimpleTCPClient)

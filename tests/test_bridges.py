@@ -1,6 +1,7 @@
 from bevy import inject, dependency
 
 from conftest import ServiceA, Bridge
+from schism.bridges.bases import BridgeClientFacade
 from schism.controllers import get_controller
 
 
@@ -10,8 +11,9 @@ def test_client_injection(simple_entry_point_runtime):
         return s
 
     service = test()
-    assert isinstance(service, Bridge)
-    assert service.acting_as == "client"
+    assert isinstance(service, BridgeClientFacade)
+    assert isinstance(service.client, Bridge)
+    assert service.client.acting_as == "client"
 
 
 def test_server_creation(simple_entry_point_runtime):
