@@ -77,18 +77,14 @@ class BridgeClient(ABC):
         ...
 
 
-class BridgeServer(ABC):
     """Bridge servers provide a publicly accessible API for calling a service type.
 
     It is important that bridge servers capture exceptions raised while calling the service and pass them to the client
     so that they can be properly propagated and handled by the client code."""
+class BridgeServer:
     def __init__(self, config: Any, middleware_stack: "middleware.MiddlewareStackBuilder"):
         self.config = config
         self.middleware = middleware_stack
-
-    @abstractmethod
-    async def launch(self):
-        ...
 
     async def call_service(self, payload: MethodCallPayload) -> ResultPayload:
         middleware_stack = self.middleware.get_middleware(
