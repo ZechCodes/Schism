@@ -11,6 +11,9 @@ directs calls to the greeting service running in the other process.
 The demo can also be run in a single process by running it as a normal python script using either the
 `python greetings.py` or `python -m greetings` command. This keeps everything running in the same process with no
 changes made in the runtime.
+
+This demo also contains a simple middleware that logs out values at each filter event and filters the final result in
+the client.
 """
 from bevy import inject, dependency
 from schism import Service, start_app
