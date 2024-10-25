@@ -26,7 +26,7 @@ middleware stack builder """
 import traceback
 from abc import ABC, abstractmethod
 from functools import partial
-from typing import Type, TYPE_CHECKING, Any, TypedDict
+from typing import Awaitable, Type, TYPE_CHECKING, Any, TypedDict
 
 from bevy import get_repository
 
@@ -103,26 +103,13 @@ class BridgeClient(ABC):
 class BridgeServer:
     """Bridge servers take method call payloads and propagate them to the service itself, responding to the client with
     the result payload return from call_service."""
-    def __init__(self, config: Any, middleware_stack: "middleware.MiddlewareStackBuilder"):
+    def __init__(self, config: Any, service_facade: "BridgeServiceFacade"):
         self.config = config
-        self.middleware = middleware_stack
+        self.service_facade = service_facade
 
-    async def call_service(self, payload: MethodCallPayload) -> ResultPayload:
-        middleware_stack = self.middleware.get_middleware(
-            middleware.FilterEvent.SERVER_CALL, middleware.FilterEvent.SERVER_RESULT
-        )
-        with ResponseBuilder() as result:
-            filtered_payload = await middleware_stack.filter(middleware.FilterEvent.SERVER_CALL, payload)
+    def call_async_method(self, payload: MethodCallPayload) -> Awaitable[ResultPayload]:
+        return self.service_facade.call_async_method(payload)
 
-            service = get_repository().get(filtered_payload["service"])
-            method = getattr(service, filtered_payload["method"])
-            return_value = await method(*filtered_payload["args"], **filtered_payload["kwargs"])
-
-            filtered_return = await middleware_stack.filter(middleware.FilterEvent.SERVER_RESULT, return_value)
-
-            result.set(filtered_return)
-
-        return result.payload
 
 
 class BaseBridge(ABC):
@@ -134,7 +121,7 @@ class BaseBridge(ABC):
 
     @classmethod
     @abstractmethod
-    def create_server(cls, config: Any, middleware_stack: "middleware.MiddlewareStackBuilder") -> BridgeServer:
+    def create_server(cls, config: Any, service_facade: "BridgeServiceFacade") -> BridgeServer:
         ...
 
     @classmethod
@@ -192,3 +179,32 @@ class BridgeClientFacade:
 
             case payload:
                 raise RuntimeError(f"Impossible State, server response must be malformed: {payload!r}")
+
+
+class BridgeServiceFacade:
+    """The service facade gets the method call payload from the bridge server and handles calling the method on the
+    service, capturing the return value and any exceptions to pass back to the bridge server as a result payload which
+    is then sent to the client."""
+    def __init__(self, service_type: "Type[Service]", middleware_stack: "middleware.MiddlewareStackBuilder"):
+        self.service_type = service_type
+        self.middleware = middleware_stack
+
+    async def call_async_method(self, payload: MethodCallPayload) -> ResultPayload:
+        middleware_stack = self.middleware.get_middleware(
+            middleware.FilterEvent.SERVER_CALL, middleware.FilterEvent.SERVER_RESULT
+        )
+        with ResponseBuilder() as result:
+            filtered_payload = await middleware_stack.filter(middleware.FilterEvent.SERVER_CALL, payload)
+
+            if payload["service"] != self.service_type:
+                raise RuntimeError(f"Service types do not match: {self.service_type} != {payload['service']}")
+
+            service = get_repository().get(self.service_type)
+            method = getattr(service, filtered_payload["method"])
+            return_value = await method(*filtered_payload["args"], **filtered_payload["kwargs"])
+
+            filtered_return = await middleware_stack.filter(middleware.FilterEvent.SERVER_RESULT, return_value)
+
+            result.set(filtered_return)
+
+        return result.payload

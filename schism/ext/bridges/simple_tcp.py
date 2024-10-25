@@ -46,7 +46,7 @@ import pickle
 from asyncio import StreamReader, StreamWriter
 from functools import lru_cache
 
-from schism.bridges import BaseBridge, BridgeClient, BridgeServer, MethodCallPayload, ResultPayload
+from schism.bridges import BaseBridge, BridgeClient, BridgeServer, BridgeServiceFacade, MethodCallPayload, ResultPayload
 from schism.configs import SchismConfigModel
 from schism.controllers import get_controller
 from schism.middleware import MiddlewareStackBuilder
@@ -162,7 +162,7 @@ class SimpleTCPServer(BridgeServer):
     async def _handle_request(self, reader, writer):
         with contextlib.closing(writer):
             call_payload: MethodCallPayload = await read(reader)
-            result = await self.call_service(call_payload)
+            result = await self.call_async_method(call_payload)
             await send(result, writer)
 
 
@@ -174,8 +174,8 @@ class SimpleTCP(BaseBridge):
         return SimpleTCPClient(config)
 
     @classmethod
-    def create_server(cls, config: SimpleTCPConfig, middleware_stack: MiddlewareStackBuilder) -> SimpleTCPServer:
-        server = SimpleTCPServer(config, middleware_stack)
+    def create_server(cls, config: SimpleTCPConfig, service_facade: BridgeServiceFacade) -> SimpleTCPServer:
+        server = SimpleTCPServer(config, service_facade)
         get_controller().add_launch_task(server.launch())
         return server
 
