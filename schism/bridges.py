@@ -32,6 +32,7 @@ from bevy import get_repository
 
 import schism.middleware as middleware
 
+
 if TYPE_CHECKING:
     from schism.services import Service
 
@@ -143,7 +144,7 @@ class BridgeClientFacade:
         bridge_type: Type[BaseBridge],
         service_type: "Type[Service]",
         config: Any,
-        middleware_stack: "middleware.MiddlewareStackBuilder"
+        middleware_stack: "middleware.MiddlewareStack"
     ):
         self.client = bridge_type.create_client(config)
         self.service_type = service_type
@@ -153,20 +154,19 @@ class BridgeClientFacade:
         return partial(self._call, item)
 
     async def _call(self, method: str, *args, **kwargs):
-        middleware_stack = self.middleware.get_middleware(
-            middleware.FilterEvent.CLIENT_CALL, middleware.FilterEvent.CLIENT_RESULT
-        )
-
         payload = MethodCallPayload(
             service=self.service_type,
             method=method,
             args=args,
             kwargs=kwargs,
         )
-        filtered_payload = await middleware_stack.filter(middleware.FilterEvent.CLIENT_CALL, payload)
-        result = await self.client.call_async_method(filtered_payload)
-        filtered_result = await middleware_stack.filter(middleware.FilterEvent.CLIENT_RESULT, result)
-        return await self._process_result(filtered_result)
+        result = await self.middleware.run(
+            middleware.MiddlewareContext.CLIENT,
+            payload,
+            self.client.call_async_method
+        )
+        return await self._process_result(result)
+
 
     async def _process_result(self, result: ResultPayload):
         match result:
@@ -190,26 +190,24 @@ class BridgeServiceFacade:
     """The service facade gets the method call payload from the bridge server and handles calling the method on the
     service, capturing the return value and any exceptions to pass back to the bridge server as a result payload which
     is then sent to the client."""
-    def __init__(self, service_type: "Type[Service]", middleware_stack: "middleware.MiddlewareStackBuilder"):
+    def __init__(
+        self,
+        service_type: "Type[Service]",
+        middleware_stack: "middleware.MiddlewareStack",
+    ):
         self.service_type = service_type
         self.middleware = middleware_stack
 
-    async def call_async_method(self, payload: MethodCallPayload) -> ResultPayload:
-        middleware_stack = self.middleware.get_middleware(
-            middleware.FilterEvent.SERVER_CALL, middleware.FilterEvent.SERVER_RESULT
-        )
-        with ResponseBuilder() as result:
-            filtered_payload = await middleware_stack.filter(middleware.FilterEvent.SERVER_CALL, payload)
-
+    async def call_async_method(self, _payload: MethodCallPayload) -> ResultPayload:
+        def call(payload):
             if payload["service"] != self.service_type:
                 raise ValueError(f"Service types do not match: {self.service_type} != {payload['service']}")
 
             service = get_repository().get(self.service_type)
-            method = getattr(service, filtered_payload["method"])
-            return_value = await method(*filtered_payload["args"], **filtered_payload["kwargs"])
+            method = getattr(service, payload["method"])
+            return method(*payload["args"], **payload["kwargs"])
 
-            filtered_return = await middleware_stack.filter(middleware.FilterEvent.SERVER_RESULT, return_value)
-
-            result.set(filtered_return)
+        with ResponseBuilder() as result:
+            result <<= await self.middleware.run(middleware.MiddlewareContext.SERVER, _payload, call)
 
         return result.payload

@@ -40,7 +40,8 @@ from tramp.optionals import Optional
 import schism.services as services
 import schism.configs as configs
 from schism.bridges import BridgeServiceFacade
-from schism.middleware import MiddlewareStackBuilder
+from schism.middleware import MiddlewareContext
+
 
 type ServicesConfigMapping = dict[Type[services.Service], configs.ServiceConfig]
 
@@ -238,7 +239,7 @@ class DistributedController(SchismController):
         bridge = service_config.get_bridge_type()
         service_facade = BridgeServiceFacade(
             service_config.get_service_type(),
-            MiddlewareStackBuilder(service_config.get_bridge_middleware()),
+            service_config.get_bridge_middleware(),
         )
         self._servers[service_config.service] = bridge.create_server(
             bridge.config_factory(service_config.bridge),

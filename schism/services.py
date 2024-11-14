@@ -1,6 +1,6 @@
 import schism.controllers
 from schism.bridges import BridgeClientFacade
-from schism.middleware import MiddlewareStackBuilder
+from schism.middleware import MiddlewareContext
 
 
 class Service:
@@ -20,5 +20,5 @@ class Service:
                 bridge_type=bridge,
                 service_type=cls,
                 config=bridge.config_factory(service_config.bridge),
-                middleware_stack=MiddlewareStackBuilder(service_config.get_bridge_middleware()),
+                middleware_stack=service_config.get_bridge_middleware(),
             )

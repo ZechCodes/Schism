@@ -7,7 +7,8 @@ from typing import Type, TYPE_CHECKING, Any
 from nubby import ConfigModel
 from pydantic import BaseModel
 
-from schism.middleware import Middleware
+from schism.middleware import Middleware, MiddlewareStack
+
 
 type StringOrSettings = str | dict[str, Any]
 
@@ -60,23 +61,24 @@ class ServiceConfig(SchismConfigModel, lax=True):
         """Passes the bridge config to the bridge type's config factory method and passes back its return."""
         return self.get_bridge_type().config_factory(self.bridge)
 
-    def get_bridge_middleware(self) -> dict[Type[Middleware], dict[str, Any]]:
+    def get_bridge_middleware(self) -> MiddlewareStack:
         """Finds the module for the middleware type and gets the middleware type from the module."""
         match self.bridge:
             case {"middleware": list() as middleware}:
-                return dict(self._generate_middleware(middleware))
+                return MiddlewareStack(*self._generate_middleware(middleware))
 
             case _:
-                return {}
+                return MiddlewareStack()
 
     def _generate_middleware(self, middleware: list[StringOrSettings]):
         for middleware_setting in middleware:
             match middleware_setting:
                 case str() as locator:
-                    yield self._load_object(locator), {}
+                    yield self._load_object(locator)
 
                 case {"type": locator, **settings}:
-                    yield self._load_object(locator), settings
+                    obj = self._load_object(locator)
+                    yield lambda *a, **k: obj(*a, **settings | k)
 
                 case _:
                     raise ValueError(f"Invalid configuration for service {self.name}: {middleware!r}")
