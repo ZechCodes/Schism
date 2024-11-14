@@ -7,7 +7,7 @@ from typing import Type, TYPE_CHECKING, Any
 from nubby import ConfigModel
 from pydantic import BaseModel
 
-from schism.middleware import Middleware, MiddlewareStack
+from schism.middleware import MiddlewareStack
 
 
 type StringOrSettings = str | dict[str, Any]
