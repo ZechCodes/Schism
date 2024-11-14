@@ -202,7 +202,7 @@ class BridgeServiceFacade:
             filtered_payload = await middleware_stack.filter(middleware.FilterEvent.SERVER_CALL, payload)
 
             if payload["service"] != self.service_type:
-                raise RuntimeError(f"Service types do not match: {self.service_type} != {payload['service']}")
+                raise ValueError(f"Service types do not match: {self.service_type} != {payload['service']}")
 
             service = get_repository().get(self.service_type)
             method = getattr(service, filtered_payload["method"])
