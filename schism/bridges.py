@@ -36,39 +36,6 @@ if TYPE_CHECKING:
     from schism.services import Service
 
 
-class ResponseBuilder:
-    """A helper context that captures all exceptions that are raised on the server while attempting to respond to a
-    client request.
-
-    In a standard single process application, errors raised by a method are handled by the caller. So it is necessary to
-    capture all exceptions raised by a service and propagate them to the client so that the calling code can handle
-    those exceptions as normal."""
-    def __init__(self):
-        self.payload: ResultPayload = ReturnPayload(result=None)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if exc_type is not None:
-            self.payload = ExceptionPayload(
-                error=exc_val,
-                traceback=traceback.format_exception(exc_type, exc_val, exc_tb),
-            )
-
-        return True
-
-    def set(self, data):
-        """Set the response payload. This payload is overwritten by any exceptions that are raised."""
-        self.payload = ReturnPayload(result=data)
-
-
-class RemoteError(Exception):
-    """RemoteError is used to wrap a stacktrace passed from a service to a client. This error type is never raised on
-    its own, instead it is given as the cause for an exception that is raised by the client to propagate an error that
-    occurred on the server."""
-
-
 class MethodCallPayload(TypedDict):
     service: "Type[Service]"
     method: str
@@ -86,6 +53,44 @@ class ExceptionPayload(TypedDict):
 
 
 type ResultPayload = ReturnPayload | ExceptionPayload
+
+
+class ResponseBuilder[Payload: ResultPayload]:
+    """A helper context that captures all exceptions that are raised on the server while attempting to respond to a
+    client request.
+
+    In a standard single process application, errors raised by a method are handled by the caller. So it is necessary to
+    capture all exceptions raised by a service and propagate them to the client so that the calling code can handle
+    those exceptions as normal."""
+    def __init__(self):
+        self._payload: Payload = ReturnPayload(result=None)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is not None:
+            self._payload = ExceptionPayload(
+                error=exc_val,
+                traceback=traceback.format_exception(exc_type, exc_val, exc_tb),
+            )
+
+        return True
+
+    def __ilshift__(self, other: Payload):
+        """Set the response payload. This payload is overwritten by any exceptions that are raised."""
+        self._payload = ReturnPayload(result=other)
+        return self
+
+    @property
+    def payload(self) -> Payload:
+        return self._payload
+
+
+class RemoteError(Exception):
+    """RemoteError is used to wrap a stacktrace passed from a service to a client. This error type is never raised on
+    its own, instead it is given as the cause for an exception that is raised by the client to propagate an error that
+    occurred on the server."""
 
 
 class BridgeClient(ABC):
