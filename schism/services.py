@@ -1,3 +1,7 @@
+from typing import Type
+
+from bevy import Repository
+
 import schism.controllers
 from schism.bridges import BridgeClientFacade
 from schism.middleware import MiddlewareContext
@@ -22,3 +26,12 @@ class Service:
                 config=bridge.config_factory(service_config.bridge),
                 middleware_stack=service_config.get_bridge_middleware(),
             )
+
+
+async def wait_for(service: Type[Service], *, timeout: float = 5.0):
+    match Repository.get_repository().get(service):
+        case BridgeClientFacade() as client:
+            await client.wait_for_ready(timeout=timeout)
+
+        case _:
+            pass
