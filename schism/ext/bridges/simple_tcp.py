@@ -133,7 +133,12 @@ class SimpleTCPClient(BridgeClient):
         )
 
     async def call_async_method(self, payload: MethodCallPayload):
-        reader, writer = await connect(self.host, self.port)
+        try:
+            reader, writer = await connect(self.host, self.port)
+        except RuntimeError as e:
+            raise RuntimeError(f"Unable to call async method {payload['method']} of service on {self.host}:{
+            self.port}") from e
+
         with contextlib.closing(writer):
             await send(payload, writer)
             return await read(reader)
