@@ -45,6 +45,7 @@ import os
 import pickle
 from asyncio import StreamReader, StreamWriter
 from functools import lru_cache
+from typing import Literal
 
 from schism.bridges import BaseBridge, BridgeClient, BridgeServer, BridgeServiceFacade, MethodCallPayload, ResultPayload
 from schism.configs import SchismConfigModel
@@ -52,6 +53,9 @@ from schism.controllers import get_controller
 
 
 SIMPLE_TCP_VERSION_SUPPORTED = 0
+
+
+type PingPayload = Literal["ping"]
 
 
 def _generate_signature(data: bytes) -> bytes:
@@ -76,7 +80,7 @@ async def read_version(reader: StreamReader) -> int:
     return int.from_bytes(version, byteorder="big")
 
 
-async def read(reader: StreamReader) -> ResultPayload | MethodCallPayload:
+async def read(reader: StreamReader) -> ResultPayload | MethodCallPayload | PingPayload:
     """When reading from a TCP connection first read 2 bytes to get the version, then 4 bytes to get the content length.
     Next read the 64 byte signature. Next read the content and validate the signature matches. If it does then it is
     safe to load the payload pickle.
@@ -99,7 +103,7 @@ async def read(reader: StreamReader) -> ResultPayload | MethodCallPayload:
     return pickle.loads(payload)
 
 
-async def send(data: ResultPayload | MethodCallPayload, writer: StreamWriter):
+async def send(data: ResultPayload | MethodCallPayload | PingPayload, writer: StreamWriter):
     """When writing to a TCP connection first write the 2 byte protocol version then the 4 byte content length of the
     pickled data, then the 64 byte signature, and finally write the pickle."""
     payload = pickle.dumps(data)
@@ -165,9 +169,17 @@ class SimpleTCPServer(BridgeServer):
 
     async def _handle_request(self, reader, writer):
         with contextlib.closing(writer):
-            call_payload: MethodCallPayload = await read(reader)
-            result = await self.call_async_method(call_payload)
-            await send(result, writer)
+            match await read(reader):
+                case "ping":
+                    await send("ping", writer)
+                    return
+
+                case dict() as call_payload if MethodCallPayload.__required_keys__.issubset(call_payload.keys()):
+                    result = await self.call_async_method(call_payload)
+                    await send(result, writer)
+
+                case payload:
+                    raise RuntimeError(f"Invalid payload: {payload}")
 
 
 class SimpleTCP(BaseBridge):
