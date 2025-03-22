@@ -105,6 +105,11 @@ class BridgeClient(ABC):
         with."""
         ...
 
+    @abstractmethod
+    async def wait_for_server(self, *, timeout: float = 5.0):
+        """Should wait for the server to be ready to accept requests."""
+        ...
+
 
 class BridgeServer:
     """Bridge servers take method call payloads and propagate them to the service itself, responding to the client with
@@ -152,6 +157,9 @@ class BridgeClientFacade:
 
     def __getattr__(self, item):
         return partial(self._call, item)
+
+    async def wait_for_server(self, *, timeout: float = 5.0):
+        await self.client.wait_for_server(timeout=timeout)
 
     async def _call(self, method: str, *args, **kwargs):
         payload = MethodCallPayload(

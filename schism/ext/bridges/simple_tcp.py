@@ -43,6 +43,7 @@ import contextlib
 import hashlib
 import os
 import pickle
+import time
 from asyncio import StreamReader, StreamWriter
 from functools import lru_cache
 from typing import Literal
@@ -146,6 +147,25 @@ class SimpleTCPClient(BridgeClient):
         with contextlib.closing(writer):
             await send(payload, writer)
             return await read(reader)
+
+    async def wait_for_server(self, *, timeout: float = 5.0):
+        start = time.monotonic()
+        while True:
+            try:
+                reader, writer = await connect(self.host, self.port)
+                try:
+                    await send("ping", writer)
+                    response = await read(reader)
+                finally:
+                    writer.close()
+
+            except RuntimeError:
+                if time.monotonic() - start > timeout:
+                    raise TimeoutError(f"Timed out waiting for server to be ready at {self.host}:{self.port}")
+
+            else:
+                if response == "ping":
+                    return
 
 
 class SimpleTCPServer(BridgeServer):
