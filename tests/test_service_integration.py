@@ -7,7 +7,7 @@ from bevy import Repository
 from schism.controllers import DistributedController
 from schism.services import wait_for
 
-from service_test import ServiceA, ServiceC
+from service_test import ServiceA, ServiceB, ServiceC
 
 
 @pytest.fixture(autouse=True)
@@ -32,7 +32,7 @@ async def test_service_integration():
         stack.push_async_callback(_kill, service_b)
 
         await wait_for(ServiceA)
-        await wait_for(ServiceC)
+        await wait_for(ServiceB)
 
         service = ServiceC()
         assert service.a_is_remote()
