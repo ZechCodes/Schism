@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import AsyncExitStack
 
 import pytest
 from bevy import Repository
@@ -18,15 +19,17 @@ def setup_service_runtime():
 
 @pytest.mark.asyncio
 async def test_service_integration():
-    service_a = await asyncio.create_subprocess_shell(
-        "python -m schism.run service service-a",
-    )
-    service_b = await asyncio.create_subprocess_shell(
-        "SCHISM_ACTIVE_SERVICE=service-b python -m schism.run service",
-    )
-    await asyncio.sleep(1)
+    async with AsyncExitStack() as stack:
+        service_a = await asyncio.create_subprocess_shell(
+            "python -m schism.run service service-a",
+        )
+        stack.push_async_callback(_kill, service_a)
 
-    try:
+        service_b = await asyncio.create_subprocess_shell(
+            "SCHISM_ACTIVE_SERVICE=service-b python -m schism.run service",
+        )
+        stack.push_async_callback(_kill, service_b)
+
         service = ServiceC()
         assert service.a_is_remote()
         assert service.b_is_remote()
@@ -41,8 +44,7 @@ async def test_service_integration():
         assert await service.get_a() == 2
         assert await service.get_b() == 2
 
-    finally:
-        service_a.terminate()
-        service_b.terminate()
-        await service_a.wait()
-        await service_b.wait()
+
+async def _kill(process):
+    process.terminate()
+    await process.wait()
