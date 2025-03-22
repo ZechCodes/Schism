@@ -31,7 +31,7 @@ class Service:
 async def wait_for(service: Type[Service], *, timeout: float = 5.0):
     match Repository.get_repository().get(service):
         case BridgeClientFacade() as client:
-            await client.wait_for_ready(timeout=timeout)
+            await client.wait_for_server(timeout=timeout)
 
         case _:
             pass
