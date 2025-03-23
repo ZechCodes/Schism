@@ -29,6 +29,7 @@ class Service:
 
 
 async def wait_for(service: Type[Service], *, timeout: float = 5.0):
+    """Waits for a service to be ready to accept requests. This returns immediately if the service is not remote."""
     match Repository.get_repository().get(service):
         case BridgeClientFacade() as client:
             await client.wait_for_server(timeout=timeout)

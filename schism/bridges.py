@@ -128,15 +128,20 @@ class BaseBridge(ABC):
     @classmethod
     @abstractmethod
     def create_client(cls, config: Any) -> BridgeClient:
+        """Should return an instance of the bridge client."""
         ...
 
     @classmethod
     @abstractmethod
     def create_server(cls, config: Any, service_facade: "BridgeServiceFacade") -> BridgeServer:
+        """Should return an instance of the bridge server and register any launch tasks or endpoints that are needed to
+        make it accessible."""
         ...
 
     @classmethod
     def config_factory(cls, bridge_config: Any) -> Any:
+        """Should process any settings that can be passed to the bridge from a service config in the schism.config file,
+        this return is passed through to the create_client and create_server methods."""
         return bridge_config
 
 
@@ -159,6 +164,7 @@ class BridgeClientFacade:
         return partial(self._call, item)
 
     async def wait_for_server(self, *, timeout: float = 5.0):
+        """Waits for the server to be ready to accept requests."""
         await self.client.wait_for_server(timeout=timeout)
 
     async def _call(self, method: str, *args, **kwargs):
@@ -207,6 +213,8 @@ class BridgeServiceFacade:
         self.middleware = middleware_stack
 
     async def call_async_method(self, _payload: MethodCallPayload) -> ResultPayload:
+        """Call the method on the service and return the result payload."""
+
         def call(payload):
             if payload["service"] != self.service_type:
                 raise ValueError(f"Service types do not match: {self.service_type} != {payload['service']}")
