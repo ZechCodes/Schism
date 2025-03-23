@@ -78,10 +78,9 @@ class ResponseBuilder[Payload: ResultPayload]:
 
         return True
 
-    def __ilshift__(self, other: Payload):
+    def set(self, payload: Payload):
         """Set the response payload. This payload is overwritten by any exceptions that are raised."""
-        self._payload = ReturnPayload(result=other)
-        return self
+        self._payload = ReturnPayload(result=payload)
 
     @property
     def payload(self) -> Payload:
@@ -224,6 +223,8 @@ class BridgeServiceFacade:
             return method(*payload["args"], **payload["kwargs"])
 
         with ResponseBuilder() as result:
-            result <<= await self.middleware.run(middleware.MiddlewareContext.SERVER, _payload, call)
+            result.set(
+                await self.middleware.run(middleware.MiddlewareContext.SERVER, _payload, call)
+            )
 
         return result.payload
