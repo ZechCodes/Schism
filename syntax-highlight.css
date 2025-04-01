@@ -1,0 +1,188 @@
+/**
+ * Custom syntax highlighting theme for Schism
+ * Neon tech-inspired theme with greens, whites on black
+ */
+
+/* Code block background and text */
+pre[class*="language-"],
+code[class*="language-"] {
+  color: #f8f8f2;
+  background: transparent;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.9rem;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  tab-size: 4;
+  hyphens: none;
+  overflow-y: hidden;
+}
+
+/* Code block container */
+.code-block {
+  border-radius: 6px;
+  margin: 1rem 0;
+  overflow-x: auto;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  position: relative;
+}
+
+/* Line numbers */
+pre[class*="language-"] {
+  padding: 1em 1.5em 1em 4.5em;
+  margin: 0;
+}
+
+.line-numbers .line-numbers-rows {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  font-size: 100%;
+  left: 0.8em;
+  width: 3.2em; /* works for line-numbers below 1000 lines */
+  letter-spacing: -1px;
+  border-right: 1px solid rgba(0, 255, 0, 0.5);
+  user-select: none;
+  background-color: transparent;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+  text-align: right;
+}
+
+.line-numbers-rows > span {
+  display: block;
+  counter-increment: linenumber;
+}
+
+.line-numbers-rows > span:before {
+  color: rgba(0, 255, 0, 0.8);
+  text-shadow: 0 0 2px rgba(0, 255, 0, 0.4);
+  font-weight: 500;
+  padding-right: 0.8em;
+  content: counter(linenumber);
+  display: block;
+  text-align: right;
+}
+
+/* Token colors */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #5d7a5d;
+}
+
+.token.punctuation {
+  color: #a0a0a0;
+}
+
+.token.namespace {
+  opacity: 0.7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #ffffff;
+}
+
+.token.boolean,
+.token.number {
+  color: #ffffff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #00ff00; /* Neon green for strings */
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #00ffff; /* Cyan for keywords */
+}
+
+.token.function,
+.token.class-name {
+  color: #66ff66; /* Light green for functions and classes */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #ffffff;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+/* Python specific */
+.language-python .token.decorator {
+  color: #ffffff;
+}
+
+.language-python .token.function {
+  color: #66ff66;
+}
+
+.language-python .token.builtin {
+  color: #ffffff;
+}
+
+/* YAML specific */
+.language-yaml .token.key {
+  color: #00ffff;
+}
+
+.language-yaml .token.string {
+  color: #00ff00;
+}
+
+/* Bash specific */
+.language-bash .token.function {
+  color: #66ff66;
+}
+
+/* Inline code */
+:not(pre) > code {
+  background-color: #000;
+  color: #00ff00;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  white-space: nowrap;
+}
+
+/* Add a subtle glow effect to code blocks on hover */
+.code-block:hover {
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+}

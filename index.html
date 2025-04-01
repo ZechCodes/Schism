@@ -10,6 +10,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Prism.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
+    <!-- Custom syntax highlighting overrides -->
+    <link rel="stylesheet" href="syntax-highlight.css">
 </head>
 <body>
     <header>
@@ -57,7 +63,7 @@
             <div class="installation">
                 <h3>Installation</h3>
                 <div class="code-block">
-                    <pre><code>pip install schism</code></pre>
+                    <pre class="line-numbers"><code class="language-bash">pip install schism</code></pre>
                 </div>
                 <p>Requires Python 3.12 or higher</p>
             </div>
@@ -66,7 +72,7 @@
                 <h3>Basic Usage</h3>
                 <p>Create a service by inheriting from <code>schism.Service</code>:</p>
                 <div class="code-block">
-                    <pre><code># greetings.py
+                    <pre class="line-numbers"><code class="language-python"># greetings.py
 from bevy import inject, dependency
 from schism import Service, start_app
 
@@ -91,7 +97,7 @@ if __name__ == "__main__":
 
                 <p>Create a <code>schism.config.yaml</code> file:</p>
                 <div class="code-block">
-                    <pre><code>launch:
+                    <pre class="line-numbers"><code class="language-yaml">launch:
   app: greetings:main
 services:
   - name: greeting
@@ -104,17 +110,17 @@ services:
                 <h3>Running Your Application</h3>
                 <p>Run as a service:</p>
                 <div class="code-block">
-                    <pre><code>schism run service greeting</code></pre>
+                    <pre class="line-numbers"><code class="language-bash">schism run service greeting</code></pre>
                 </div>
 
                 <p>Run the client application:</p>
                 <div class="code-block">
-                    <pre><code>schism run</code></pre>
+                    <pre class="line-numbers"><code class="language-bash">schism run</code></pre>
                 </div>
 
                 <p>Or run as a monolith:</p>
                 <div class="code-block">
-                    <pre><code>python greetings.py</code></pre>
+                    <pre class="line-numbers"><code class="language-bash">python greetings.py</code></pre>
                 </div>
             </div>
         </div>
@@ -136,5 +142,13 @@ services:
             </div>
         </div>
     </footer>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
 </body>
 </html>

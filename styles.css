@@ -7,7 +7,9 @@
     --background: #ffffff;
     --card-bg: #f8f9fa;
     --border-color: #e9ecef;
-    --code-bg: #f5f7f9;
+    --code-bg: #222;
+    --code-text: #00ff00;
+    --code-border: rgba(0, 255, 0, 0.2);
 }
 
 * {
@@ -160,14 +162,41 @@ section h2 {
 .code-block {
     background-color: var(--code-bg);
     border-radius: 6px;
-    padding: 1.5rem;
-    margin: 1rem 0;
+    margin: 1rem -16px;
     overflow-x: auto;
+    padding: 8px 16px;
+}
+
+.code-block pre {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.code-block pre code {
+    font-size: 0.9rem;
+    display: block;
 }
 
 code {
     font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
     font-size: 0.9rem;
+    padding-left: 3.2em;
+}
+
+/* Prism.js line numbers customization */
+.line-numbers .line-numbers-rows {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    padding-right: 0.5rem;
+    margin-left: -1.6em;
+}
+
+/* Make inline code stand out */
+:not(pre) > code {
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    padding: 0.2em 0.4em;
+    white-space: nowrap;
 }
 
 .installation, .usage {
@@ -218,28 +247,28 @@ footer .container {
     header {
         padding: 60px 0;
     }
-    
+
     header h1 {
         font-size: 2.5rem;
     }
-    
+
     .tagline {
         font-size: 1.2rem;
     }
-    
+
     section {
         padding: 60px 0;
     }
-    
+
     .feature-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .cta-buttons {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .btn {
         width: 100%;
         max-width: 300px;
