@@ -34,22 +34,52 @@
             <h2>Features</h2>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🔌</div>
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="96" height="96" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"></path>
+                            <path d="M17 12h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"></path>
+                            <path d="M7 12V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6"></path>
+                            <line x1="12" y1="4" x2="12" y2="2"></line>
+                        </svg>
+                    </div>
                     <h3>Autowiring</h3>
                     <p>Simplifies dependency injection between services using Bevy's dependency injection system.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🧩</div>
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="96" height="96" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                            <path d="M10 7h4M7 10v4M17 10v4M10 17h4"></path>
+                        </svg>
+                    </div>
                     <h3>Modular Design</h3>
                     <p>Makes modularity straightforward in monolithic applications and facilitates code sharing in microservices.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🔄</div>
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="96" height="96" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5"></path>
+                            <path d="M2 12l10 5 10-5"></path>
+                            <line x1="12" y1="22" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
                     <h3>Flexible Deployment</h3>
                     <p>Run as a monolith or distributed services with minimal code changes.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">⚙️</div>
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="96" height="96" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="9" y1="13" x2="15" y2="13"></line>
+                            <line x1="9" y1="17" x2="15" y2="17"></line>
+                            <line x1="9" y1="9" x2="10" y2="9"></line>
+                        </svg>
+                    </div>
                     <h3>Simple Configuration</h3>
                     <p>Configure your services with a simple YAML file.</p>
                 </div>
@@ -67,7 +97,7 @@
                 </div>
                 <p>Requires Python 3.12 or higher</p>
             </div>
-            
+
             <div class="usage">
                 <h3>Basic Usage</h3>
                 <p>Create a service by inheriting from <code>schism.Service</code>:</p>
@@ -94,7 +124,7 @@ async def main():
 if __name__ == "__main__":
     start_app(main())  # Activate a Schism controller and launch the app</code></pre>
                 </div>
-                
+
                 <p>Create a <code>schism.config.yaml</code> file:</p>
                 <div class="code-block">
                     <pre class="line-numbers"><code class="language-yaml">launch:
@@ -106,18 +136,18 @@ services:
       type: schism.ext.bridges.simple_tcp:SimpleTCP
       serve_on: localhost:1234</code></pre>
                 </div>
-                
+
                 <h3>Running Your Application</h3>
                 <p>Run as a service:</p>
                 <div class="code-block">
                     <pre class="line-numbers"><code class="language-bash">schism run service greeting</code></pre>
                 </div>
-                
+
                 <p>Run the client application:</p>
                 <div class="code-block">
                     <pre class="line-numbers"><code class="language-bash">schism run</code></pre>
                 </div>
-                
+
                 <p>Or run as a monolith:</p>
                 <div class="code-block">
                     <pre class="line-numbers"><code class="language-bash">python greetings.py</code></pre>
@@ -153,7 +183,7 @@ services:
 
     <!-- Copy code button functionality -->
     <script src="js/copy-code.js"></script>
-    
+
     <!-- Theme toggle functionality -->
     <script src="js/theme-toggle.js"></script>
 </body>
