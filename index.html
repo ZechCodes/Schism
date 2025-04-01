@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schism - Service Framework for Python</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <meta name="description" content="Schism is a service framework for Python that makes modularity simple in monoliths and simplifies code sharing in microservices.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Schism</h1>
+            <p class="tagline">A service framework for Python that makes modularity simple</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/ZechCodes/Schism" class="btn primary">View on GitHub</a>
+                <a href="#getting-started" class="btn secondary">Get Started</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="container">
+            <h2>Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔌</div>
+                    <h3>Autowiring</h3>
+                    <p>Simplifies dependency injection between services using Bevy's dependency injection system.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧩</div>
+                    <h3>Modular Design</h3>
+                    <p>Makes modularity straightforward in monolithic applications and facilitates code sharing in microservices.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Flexible Deployment</h3>
+                    <p>Run as a monolith or distributed services with minimal code changes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <h3>Simple Configuration</h3>
+                    <p>Configure your services with a simple YAML file.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="getting-started" class="getting-started">
+        <div class="container">
+            <h2>Getting Started</h2>
+            <div class="installation">
+                <h3>Installation</h3>
+                <div class="code-block">
+                    <pre><code>pip install schism</code></pre>
+                </div>
+                <p>Requires Python 3.12 or higher</p>
+            </div>
+
+            <div class="usage">
+                <h3>Basic Usage</h3>
+                <p>Create a service by inheriting from <code>schism.Service</code>:</p>
+                <div class="code-block">
+                    <pre><code># greetings.py
+from bevy import inject, dependency
+from schism import Service, start_app
+
+class GreetingService(Service):
+    async def greet(self, name: str) -> str:
+        print("Handling request...")
+        return f"Hello, {name}!"
+
+
+@inject
+async def greet(greeting_service: GreetingService = dependency()):
+    print(await greeting_service.greet("World"))
+
+
+async def main():
+    await greet()
+
+
+if __name__ == "__main__":
+    start_app(main())  # Activate a Schism controller and launch the app</code></pre>
+                </div>
+
+                <p>Create a <code>schism.config.yaml</code> file:</p>
+                <div class="code-block">
+                    <pre><code>launch:
+  app: greetings:main
+services:
+  - name: greeting
+    service: greetings:GreetingService
+    bridge:
+      type: schism.ext.bridges.simple_tcp:SimpleTCP
+      serve_on: localhost:1234</code></pre>
+                </div>
+
+                <h3>Running Your Application</h3>
+                <p>Run as a service:</p>
+                <div class="code-block">
+                    <pre><code>schism run service greeting</code></pre>
+                </div>
+
+                <p>Run the client application:</p>
+                <div class="code-block">
+                    <pre><code>schism run</code></pre>
+                </div>
+
+                <p>Or run as a monolith:</p>
+                <div class="code-block">
+                    <pre><code>python greetings.py</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="documentation">
+        <div class="container">
+            <h2>Documentation</h2>
+            <p>For more detailed documentation and examples, please visit the <a href="https://github.com/ZechCodes/Schism">GitHub repository</a>.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023-2024 Zech Zimmerman. Released under the MIT License.</p>
+            <div class="footer-links">
+                <a href="https://github.com/ZechCodes/Schism">GitHub</a>
+                <a href="https://pypi.org/project/schism/">PyPI</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
