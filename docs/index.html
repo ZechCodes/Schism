@@ -36,10 +36,21 @@
                 <div class="feature-card">
                     <div class="feature-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="96" height="96" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 12h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"></path>
-                            <path d="M17 12h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"></path>
-                            <path d="M7 12V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6"></path>
-                            <line x1="12" y1="4" x2="12" y2="2"></line>
+                            <circle cx="12" cy="5" r="2.5"></circle>
+
+                            <circle cx="5" cy="17" r="2"></circle>
+                            <circle cx="12" cy="17" r="2"></circle>
+                            <circle cx="19" cy="17" r="2"></circle>
+
+                            <!-- Connection lines -->
+                            <path d="M12 7.5L5 15"></path>
+                            <path d="M12 7.5L12 15"></path>
+                            <path d="M12 7.5L19 15"></path>
+
+                            <!-- Direction arrows -->
+                            <polyline points="6,14 5,15 6,15" stroke-width="1"></polyline>
+                            <polyline points="12,14 12,15 13,15" stroke-width="1"></polyline>
+                            <polyline points="18,14 19,15 18,15" stroke-width="1"></polyline>
                         </svg>
                     </div>
                     <h3>Autowiring</h3>
