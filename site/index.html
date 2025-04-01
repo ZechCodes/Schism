@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schism - Service Framework for Python</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <meta name="description" content="Schism is a service framework for Python that makes modularity simple in monoliths and simplifies code sharing in microservices.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
     <!-- Custom syntax highlighting overrides -->
-    <link rel="stylesheet" href="syntax-highlight.css">
+    <link rel="stylesheet" href="css/syntax-highlight.css">
 </head>
 <body>
     <header>
@@ -67,7 +67,7 @@
                 </div>
                 <p>Requires Python 3.12 or higher</p>
             </div>
-
+            
             <div class="usage">
                 <h3>Basic Usage</h3>
                 <p>Create a service by inheriting from <code>schism.Service</code>:</p>
@@ -94,7 +94,7 @@ async def main():
 if __name__ == "__main__":
     start_app(main())  # Activate a Schism controller and launch the app</code></pre>
                 </div>
-
+                
                 <p>Create a <code>schism.config.yaml</code> file:</p>
                 <div class="code-block">
                     <pre class="line-numbers"><code class="language-yaml">launch:
@@ -106,18 +106,18 @@ services:
       type: schism.ext.bridges.simple_tcp:SimpleTCP
       serve_on: localhost:1234</code></pre>
                 </div>
-
+                
                 <h3>Running Your Application</h3>
                 <p>Run as a service:</p>
                 <div class="code-block">
                     <pre class="line-numbers"><code class="language-bash">schism run service greeting</code></pre>
                 </div>
-
+                
                 <p>Run the client application:</p>
                 <div class="code-block">
                     <pre class="line-numbers"><code class="language-bash">schism run</code></pre>
                 </div>
-
+                
                 <p>Or run as a monolith:</p>
                 <div class="code-block">
                     <pre class="line-numbers"><code class="language-bash">python greetings.py</code></pre>
@@ -152,9 +152,9 @@ services:
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
 
     <!-- Copy code button functionality -->
-    <script src="copy-code.js"></script>
-
+    <script src="js/copy-code.js"></script>
+    
     <!-- Theme toggle functionality -->
-    <script src="theme-toggle.js"></script>
+    <script src="js/theme-toggle.js"></script>
 </body>
 </html>
