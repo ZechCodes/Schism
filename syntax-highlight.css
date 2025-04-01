@@ -32,6 +32,48 @@ code[class*="language-"] {
   position: relative;
 }
 
+/* Copy button */
+.copy-button {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  padding: 0.4em 0.6em;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 255, 0, 0.4);
+  border-radius: 4px;
+  color: rgba(0, 255, 0, 0.9);
+  font-size: 0.8em;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.copy-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  border-color: rgba(0, 255, 0, 0.8);
+  color: #00ff00;
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+}
+
+.copy-button:active {
+  transform: translateY(1px);
+}
+
+.copy-button.copied {
+  background-color: rgba(0, 255, 0, 0.2);
+  color: #00ff00;
+}
+
+.copy-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}
+
 /* Line numbers */
 pre[class*="language-"] {
   padding: 1em 1.5em 1em 4.5em;
