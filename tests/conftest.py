@@ -1,10 +1,13 @@
-from bevy import Repository
+from bevy import get_registry
+from bevy.containers import global_container
 from pytest_asyncio import fixture
 
 from schism.controllers import DistributedController
 from schism.configs import ApplicationConfig
 from schism.services import Service
 import schism.controllers as controllers
+
+import schism  # ensure bevy hooks are registered
 
 
 class ServiceA(Service):
@@ -34,24 +37,21 @@ class Bridge:
 
 @fixture
 def simple_entry_point_runtime():
-    repo = Repository.factory()
-    repo.set(
-        ApplicationConfig,
-        ApplicationConfig(
-            services = [
-                {
-                    "name": "service-a",
-                    "service": "conftest:ServiceA",
-                    "bridge": "conftest:Bridge",
-                },
-                {
-                    "name": "service-b",
-                    "service": "conftest:ServiceB",
-                    "bridge": "conftest:Bridge",
-                },
-            ],
-        )
+    container = get_registry().create_container()
+    container.instances[ApplicationConfig] = ApplicationConfig(
+        services = [
+            {
+                "name": "service-a",
+                "service": "conftest:ServiceA",
+                "bridge": "conftest:Bridge",
+            },
+            {
+                "name": "service-b",
+                "service": "conftest:ServiceB",
+                "bridge": "conftest:Bridge",
+            },
+        ],
     )
-    Repository.set_repository(repo)
+    global_container.set(container)
 
     DistributedController.activate()

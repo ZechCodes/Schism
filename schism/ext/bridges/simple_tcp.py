@@ -63,7 +63,7 @@ def _generate_signature(data: bytes) -> bytes:
     return hashlib.sha256(data + SimpleTCP.SECRET_KEY).hexdigest().encode()
 
 
-class SimpleTCPConfig(SchismConfigModel, lax=True):
+class SimpleTCPConfig(SchismConfigModel):
     serve_on: str
     client: str
 

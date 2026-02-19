@@ -1,6 +1,6 @@
 from typing import Type
 
-from bevy import Repository
+from bevy import get_container
 
 import schism.controllers
 from schism.bridges import BridgeClientFacade
@@ -30,7 +30,7 @@ class Service:
 
 async def wait_for(service: Type[Service], *, timeout: float = 5.0):
     """Waits for a service to be ready to accept requests. This returns immediately if the service is not remote."""
-    match Repository.get_repository().get(service):
+    match get_container().get(service):
         case BridgeClientFacade() as client:
             await client.wait_for_server(timeout=timeout)
 

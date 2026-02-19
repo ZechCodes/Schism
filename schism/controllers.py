@@ -181,7 +181,7 @@ class MonolithicController(SchismController):
     def bootstrap(self):
         """Create all services."""
         for service_config in self.active_services.values():
-            bevy.get_repository().get(service_config.get_service_type())  # Create the service instance
+            bevy.get_container().get(service_config.get_service_type())  # Create the service instance
 
     def launch(self):
         self.bootstrap()
@@ -232,7 +232,7 @@ class DistributedController(SchismController):
             )
 
         for service_config in self.active_services.values():
-            bevy.get_repository().get(service_config.get_service_type())  # Create the service instance
+            bevy.get_container().get(service_config.get_service_type())  # Create the service instance
             self._launch_server(service_config)
 
     def _launch_server(self, service_config: configs.ServiceConfig):

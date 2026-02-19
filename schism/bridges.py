@@ -28,7 +28,7 @@ from abc import ABC, abstractmethod
 from functools import partial
 from typing import Awaitable, Type, TYPE_CHECKING, Any, TypedDict
 
-from bevy import get_repository
+from bevy import get_container
 
 import schism.middleware as middleware
 
@@ -218,7 +218,7 @@ class BridgeServiceFacade:
             if payload["service"] != self.service_type:
                 raise ValueError(f"Service types do not match: {self.service_type} != {payload['service']}")
 
-            service = get_repository().get(self.service_type)
+            service = get_container().get(self.service_type)
             method = getattr(service, payload["method"])
             return method(*payload["args"], **payload["kwargs"])
 

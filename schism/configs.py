@@ -4,7 +4,6 @@ from functools import lru_cache
 from importlib import import_module
 from typing import Type, TYPE_CHECKING, Any
 
-from nubby import ConfigModel
 from pydantic import BaseModel
 
 from schism.middleware import MiddlewareStack
@@ -19,13 +18,15 @@ if TYPE_CHECKING:
     import schism.services as services
 
 
-class SchismConfigModel(BaseModel, ConfigModel, lax=True):
+class SchismConfigModel(BaseModel):
     """Base model config that implements the correct interface for serialization."""
+    model_config = {"extra": "ignore"}
+
     def to_dict(self):
         return self.model_dump()
 
 
-class LaunchConfig(SchismConfigModel, lax=True):
+class LaunchConfig(SchismConfigModel):
     """Config model for settings related to launching an app with the "schism run" command. "app" should be a module
     import path and attribute name separated by a colon. "settings" is an optional dictionary of string keys that are
     valid Python identifiers with any kind of value, these are passed as keyword arguments to the callable attribute.
@@ -38,7 +39,7 @@ class LaunchConfig(SchismConfigModel, lax=True):
     settings: dict[str, Any] | None = None
 
 
-class ServiceConfig(SchismConfigModel, lax=True):
+class ServiceConfig(SchismConfigModel):
     """Config model for a service.
     - "name" is used for referencing the service in commands
     - "service" is the module import path and class name, separated by a colon, for the service class
@@ -102,7 +103,7 @@ class ServiceConfig(SchismConfigModel, lax=True):
         return getattr(module, attr)
 
 
-class ApplicationConfig(SchismConfigModel, filename="schism.config"):
+class ApplicationConfig(SchismConfigModel):
     """Config model for an application stored in the schism.config file. By default, this file can be a JSON, TOML, or
     YAML file. Schism only checks the working directory for this file."""
     services: list[ServiceConfig]
