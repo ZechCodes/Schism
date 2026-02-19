@@ -187,7 +187,7 @@ wheels = [
 [[package]]
 name = "schism"
 version = "0.2.0b1"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "bevy" },
     { name = "nubby", extra = ["yaml"] },

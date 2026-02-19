@@ -18,32 +18,27 @@ the client.
 from bevy import inject, dependency
 from schism import Service, start_app
 from schism.bridges import MethodCallPayload, ResultPayload
-from schism.middleware import Middleware
+from schism.middleware import ContextualMiddleware
 
 remote = True
 
 
-class MiddlewareExample(Middleware):
-    async def filter_client_call(self, payload: MethodCallPayload) -> MethodCallPayload:
-        print("[MIDDLEWARE] Client call filter")
-        return payload
-
-    async def filter_client_result(self, payload: ResultPayload) -> ResultPayload:
-        print(f"[MIDDLEWARE] Client result filter")
-        match payload:
-            case {"result": result}:
-                return {"result": f"Received From Service: {result!r}"}
-
+class MiddlewareExample(ContextualMiddleware):
+    async def run_on_client(self, payload: MethodCallPayload) -> ResultPayload:
+        print("[MIDDLEWARE] Client call")
+        result = await self.next(payload)
+        print("[MIDDLEWARE] Client result")
+        match result:
+            case {"result": value}:
+                return {"result": f"Received From Service: {value!r}"}
             case _:
-                return payload
+                return result
 
-    async def filter_server_call(self, payload: MethodCallPayload) -> MethodCallPayload:
-        print("[MIDDLEWARE] Server call filter")
-        return payload
-
-    async def filter_server_result(self, payload: MethodCallPayload) -> MethodCallPayload:
-        print("[MIDDLEWARE] Server result filter")
-        return payload
+    async def run_on_server(self, payload: MethodCallPayload) -> ResultPayload:
+        print("[MIDDLEWARE] Server call")
+        result = await self.next(payload)
+        print("[MIDDLEWARE] Server result")
+        return result
 
 
 class GreetingService(Service):

@@ -29,11 +29,11 @@ class ServiceB(Service):
 
 class ServiceC(Service):
     @inject
-    async def udpate_a(self, a: ServiceA = dependency()):
+    async def update_a(self, a: ServiceA = dependency()):
         await a.increment()
 
     @inject
-    async def udpate_b(self, b: ServiceB = dependency()):
+    async def update_b(self, b: ServiceB = dependency()):
         await b.increment()
 
     @inject

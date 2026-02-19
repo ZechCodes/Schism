@@ -73,13 +73,13 @@ async def test_service_integration():
         assert service.a_is_remote()
         assert service.b_is_remote()
 
-        await service.udpate_a()
-        await service.udpate_b()
+        await service.update_a()
+        await service.update_b()
         assert await service.get_a() == 1
         assert await service.get_b() == 1
 
-        await service.udpate_a()
-        await service.udpate_b()
+        await service.update_a()
+        await service.update_b()
         assert await service.get_a() == 2
         assert await service.get_b() == 2
 

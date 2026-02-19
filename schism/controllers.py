@@ -142,7 +142,7 @@ class SchismController(ABC):
     async def _run_tasks(self):
         async with asyncio.TaskGroup() as group:
             for task in self._launch_tasks:
-                await group.create_task(task)
+                group.create_task(task)
 
     @classmethod
     def activate[Controller: SchismController](cls: Type[Controller], service: str = "") -> Controller:
