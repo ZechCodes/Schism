@@ -1,5 +1,9 @@
 # Schism
 
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg?style=flat-square)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/ZechCodes/Schism?style=flat-square)](https://github.com/ZechCodes/Schism/stargazers)
+
 Schism is a service framework designed to simplify the process of splitting a single application into multiple services. It provides autowiring capabilities that make modularity straightforward in monolithic applications and facilitates code sharing in microservices architectures.
 
 ## Installation
